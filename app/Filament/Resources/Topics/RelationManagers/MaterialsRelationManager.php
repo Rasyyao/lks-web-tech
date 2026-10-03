@@ -24,13 +24,11 @@ class MaterialsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->columns(3)
             ->components([
                 TextInput::make('title')
                     ->label('Judul')
                     ->required()
-                    ->maxLength(255)
-                    ->columnSpan(3),
+                    ->maxLength(255),
                 Select::make('level')
                     ->label('Level')
                     ->options([1 => 'Level 1', 2 => 'Level 2', 3 => 'Level 3', 4 => 'Level 4', 5 => 'Level 5'])
@@ -44,8 +42,7 @@ class MaterialsRelationManager extends RelationManager
                     ->default(0)
                     ->required(),
                 MarkdownEditor::make('body_md')
-                    ->label('Isi materi (Markdown)')
-                    ->columnSpanFull(),
+                    ->label('Isi materi (Markdown)'),
             ]);
     }
 

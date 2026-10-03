@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\QuestionBankPapers\Pages;
 
 use App\Filament\Concerns\RecordsAuditTrail;
+use App\Filament\Concerns\StacksFormSections;
 use App\Filament\Resources\QuestionBankPapers\QuestionBankPaperResource;
 use App\Models\QuestionBankPaper;
 use Filament\Resources\Pages\EditRecord;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 class EditQuestionBankPaper extends EditRecord
 {
     use RecordsAuditTrail;
+    use StacksFormSections;
 
     protected static string $resource = QuestionBankPaperResource::class;
 

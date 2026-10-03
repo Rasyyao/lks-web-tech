@@ -16,7 +16,6 @@ class TopicForm
             ->components([
                 Section::make('Topik')
                     ->description('Pengelompokan bank soal & materi latihan (mis. HTML, CSS, JavaScript, REST API).')
-                    ->columns(3)
                     ->schema([
                         TextInput::make('name')
                             ->label('Nama topik')

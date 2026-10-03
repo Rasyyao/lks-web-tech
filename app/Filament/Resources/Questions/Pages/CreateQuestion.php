@@ -3,12 +3,14 @@
 namespace App\Filament\Resources\Questions\Pages;
 
 use App\Filament\Concerns\RecordsAuditTrail;
+use App\Filament\Concerns\StacksFormSections;
 use App\Filament\Resources\Questions\QuestionResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateQuestion extends CreateRecord
 {
     use RecordsAuditTrail;
+    use StacksFormSections;
 
     protected static string $resource = QuestionResource::class;
 

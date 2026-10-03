@@ -16,13 +16,11 @@ class CohortForm
             ->components([
                 Section::make('Kelompok')
                     ->description('Kelas (mis. XII RPL 1) atau kelompok seleksi LKS.')
-                    ->columns(3)
                     ->schema([
                         TextInput::make('name')
                             ->label('Nama')
                             ->required()
-                            ->maxLength(255)
-                            ->columnSpan(2),
+                            ->maxLength(255),
                         Select::make('type')
                             ->label('Jenis')
                             ->options(CohortType::class)

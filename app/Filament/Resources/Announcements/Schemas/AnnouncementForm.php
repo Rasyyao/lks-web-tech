@@ -16,13 +16,11 @@ class AnnouncementForm
         return $schema
             ->components([
                 Section::make('Pengumuman')
-                    ->columns(2)
                     ->schema([
                         TextInput::make('title')
                             ->label('Judul')
                             ->required()
-                            ->maxLength(255)
-                            ->columnSpanFull(),
+                            ->maxLength(255),
                         Select::make('cohort_id')
                             ->label('Ditujukan untuk')
                             ->relationship('cohort', 'name')
@@ -36,8 +34,7 @@ class AnnouncementForm
                             ->default(now())
                             ->helperText('Kosongkan untuk menyimpan sebagai draf (tidak tampil ke siswa).'),
                         MarkdownEditor::make('body_md')
-                            ->label('Isi (Markdown)')
-                            ->columnSpanFull(),
+                            ->label('Isi (Markdown)'),
                     ]),
             ]);
     }

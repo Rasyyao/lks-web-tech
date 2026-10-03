@@ -21,7 +21,6 @@ class QuestionBankPaperForm
         return $schema
             ->components([
                 Section::make('Kategori')
-                    ->columns(3)
                     ->schema([
                         Select::make('year')
                             ->label('Tahun')

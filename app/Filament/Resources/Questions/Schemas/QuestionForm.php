@@ -24,15 +24,13 @@ class QuestionForm
         return $schema
             ->components([
                 Section::make('Soal')
-                    ->columns(4)
                     ->schema([
                         Select::make('topic_id')
                             ->label('Topik')
                             ->relationship('topic', 'name')
                             ->searchable()
                             ->preload()
-                            ->required()
-                            ->columnSpan(2),
+                            ->required(),
                         Select::make('type')
                             ->label('Tipe soal')
                             ->options(QuestionType::class)
@@ -48,8 +46,7 @@ class QuestionForm
                                         ['label' => 'Salah', 'is_correct' => false],
                                     ]);
                                 }
-                            })
-                            ->columnSpan(2),
+                            }),
                         Select::make('difficulty')
                             ->label('Kesulitan')
                             ->options([
@@ -61,20 +58,17 @@ class QuestionForm
                             ])
                             ->default(1)
                             ->required()
-                            ->native(false)
-                            ->columnSpan(2),
+                            ->native(false),
                         TextInput::make('points')
                             ->label('Poin')
                             ->numeric()
                             ->minValue(1)
                             ->maxValue(1000)
                             ->default(10)
-                            ->required()
-                            ->columnSpan(2),
+                            ->required(),
                         MarkdownEditor::make('body_md')
                             ->label('Pertanyaan (Markdown, blok kode diperbolehkan)')
-                            ->required()
-                            ->columnSpanFull(),
+                            ->required(),
                     ]),
 
                 Section::make('Pilihan jawaban')
@@ -94,13 +88,11 @@ class QuestionForm
                             ->maxItems(fn (Get $get): int => self::typeOf($get('type')) === QuestionType::TrueFalse ? 2 : 6)
                             ->addActionLabel('Tambah pilihan')
                             ->defaultItems(4)
-                            ->columns(['default' => 1, 'md' => 4])
                             ->schema([
                                 TextInput::make('label')
                                     ->label('Teks pilihan')
                                     ->required()
-                                    ->maxLength(255)
-                                    ->columnSpan(['md' => 3]),
+                                    ->maxLength(255),
                                 Toggle::make('is_correct')
                                     ->label('Jawaban benar')
                                     ->inline(false)
@@ -138,11 +130,9 @@ class QuestionForm
                     ]),
 
                 Section::make('Pembahasan & status')
-                    ->columns(2)
                     ->schema([
                         MarkdownEditor::make('explanation_md')
-                            ->label('Pembahasan (Markdown)')
-                            ->columnSpanFull(),
+                            ->label('Pembahasan (Markdown)'),
                         Select::make('status')
                             ->label('Status')
                             ->options(QuestionStatus::class)

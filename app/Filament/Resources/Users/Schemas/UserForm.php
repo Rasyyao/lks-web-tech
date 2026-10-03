@@ -18,7 +18,6 @@ class UserForm
             ->components([
                 Section::make('Akun')
                     ->description('Data login siswa, mentor, atau admin.')
-                    ->columns(2)
                     ->schema([
                         TextInput::make('name')
                             ->label('Nama lengkap')
@@ -52,7 +51,6 @@ class UserForm
                     ]),
 
                 Section::make('Peran & kelompok')
-                    ->columns(2)
                     ->schema([
                         Select::make('roles')
                             ->label('Peran')
@@ -72,7 +70,6 @@ class UserForm
                     ]),
 
                 Section::make('Status')
-                    ->columns(2)
                     ->schema([
                         Toggle::make('is_active')
                             ->label('Akun aktif')

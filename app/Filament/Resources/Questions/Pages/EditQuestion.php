@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Questions\Pages;
 use App\Enums\QuestionStatus;
 use App\Enums\QuestionType;
 use App\Filament\Concerns\RecordsAuditTrail;
+use App\Filament\Concerns\StacksFormSections;
 use App\Filament\Resources\Questions\QuestionResource;
 use App\Models\PracticeAttemptItem;
 use App\Models\Question;
@@ -13,6 +14,7 @@ use Filament\Resources\Pages\EditRecord;
 class EditQuestion extends EditRecord
 {
     use RecordsAuditTrail;
+    use StacksFormSections;
 
     protected static string $resource = QuestionResource::class;
 

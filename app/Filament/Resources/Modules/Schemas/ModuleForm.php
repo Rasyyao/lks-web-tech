@@ -21,7 +21,6 @@ class ModuleForm
         return $schema
             ->components([
                 Section::make('Informasi modul')
-                    ->columns(3)
                     ->schema([
                         TextInput::make('title')
                             ->label('Judul modul')
@@ -32,8 +31,7 @@ class ModuleForm
                                 if ($operation === 'create') {
                                     $set('slug', Str::slug((string) $state));
                                 }
-                            })
-                            ->columnSpan(2),
+                            }),
                         TextInput::make('slug')
                             ->required()
                             ->alphaDash()
@@ -67,12 +65,10 @@ class ModuleForm
                         Textarea::make('summary')
                             ->label('Ringkasan')
                             ->rows(2)
-                            ->maxLength(1000)
-                            ->columnSpanFull(),
+                            ->maxLength(1000),
                     ]),
 
                 Section::make('Jadwal & batas')
-                    ->columns(2)
                     ->schema([
                         DateTimePicker::make('opens_at')
                             ->label('Dibuka')
@@ -99,8 +95,7 @@ class ModuleForm
                             ->multiple()
                             ->searchable()
                             ->preload()
-                            ->helperText('Kosong = terlihat oleh semua siswa.')
-                            ->columnSpanFull(),
+                            ->helperText('Kosong = terlihat oleh semua siswa.'),
                     ]),
 
                 Section::make('Konten')
