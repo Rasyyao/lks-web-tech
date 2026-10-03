@@ -23,6 +23,44 @@ class User extends Authenticatable implements FilamentUser
         return $this->is_active && $this->hasRole('admin');
     }
 
+    /**
+     * Where this user lands by default: admins in the admin panel, mentors in
+     * the submission inbox, students on their dashboard.
+     */
+    public function homeUrl(): string
+    {
+        return match (true) {
+            $this->hasRole('admin') => url('/admin'),
+            $this->hasRole('mentor') => route('mentor.submissions'),
+            default => route('dashboard'),
+        };
+    }
+
+    /**
+     * Whether a previously requested ("intended") path is one this user may open,
+     * so a redirect after login never ends in a 403.
+     */
+    public function canVisitPath(string $path): bool
+    {
+        $path = trim($path, '/');
+
+        if ($path === 'admin' || str_starts_with($path, 'admin/')) {
+            return $this->canAccessPanel(filament()->getPanel('admin'));
+        }
+
+        if ($path === 'mentor' || str_starts_with($path, 'mentor/')) {
+            return $this->hasAnyRole(['mentor', 'admin']);
+        }
+
+        foreach (['beranda', 'modul', 'latihan', 'materi'] as $studentArea) {
+            if ($path === $studentArea || str_starts_with($path, $studentArea.'/')) {
+                return $this->hasRole('student');
+            }
+        }
+
+        return true;
+    }
+
     protected $fillable = [
         'name',
         'username',

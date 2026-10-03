@@ -53,7 +53,17 @@ class AuthController extends Controller
             return redirect()->route('profile.password');
         }
 
-        return redirect()->intended(route('dashboard'));
+        // Honour the page the user originally asked for, but never send them
+        // somewhere their role forbids (e.g. a mentor bounced to /admin),
+        // and ignore trivial landing pages (root or login form).
+        $intended = $request->session()->pull('url.intended');
+        $intendedPath = $intended ? trim((string) parse_url($intended, PHP_URL_PATH), '/') : '';
+
+        if ($intended && $intendedPath !== '' && $intendedPath !== 'masuk' && $user->canVisitPath($intendedPath)) {
+            return redirect()->to($intended);
+        }
+
+        return redirect()->to($user->homeUrl());
     }
 
     /**

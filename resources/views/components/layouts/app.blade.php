@@ -15,7 +15,7 @@
     <header class="bg-sheet border-b-[3px] border-brand">
         <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14 sm:h-16">
             {{-- Logo and school name --}}
-            <a href="{{ auth()->check() ? route('dashboard') : route('login') }}" class="flex items-center gap-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep">
+            <a href="{{ auth()->check() ? auth()->user()->homeUrl() : route('login') }}" class="flex items-center gap-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep">
                 @if(file_exists(public_path('brand/logo-smk-telkom-purwokerto.png')))
                     <img
                         src="{{ asset('brand/logo-smk-telkom-purwokerto.png') }}"

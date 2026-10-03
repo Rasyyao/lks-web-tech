@@ -1,0 +1,1 @@
+<x-layouts.error code="403" title="Akses ditolak" message="Akun Anda tidak memiliki izin untuk membuka halaman ini. Halaman ini hanya tersedia untuk peran tertentu." hint="Merasa seharusnya bisa mengakses? Hubungi admin atau mentor Anda." />

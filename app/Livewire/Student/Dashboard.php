@@ -17,6 +17,13 @@ use Livewire\Component;
 #[Title('Beranda')]
 class Dashboard extends Component
 {
+    public function mount()
+    {
+        if (! Auth::user()?->hasRole('student')) {
+            return redirect()->to(Auth::user()->homeUrl());
+        }
+    }
+
     public function render()
     {
         $user = Auth::user();

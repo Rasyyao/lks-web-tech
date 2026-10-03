@@ -1,0 +1,1 @@
+<x-layouts.error code="500" title="Terjadi kesalahan di server" message="Maaf, ada masalah di sisi kami. Pekerjaan Anda yang sudah tersimpan tetap aman. Coba lagi beberapa saat lagi." hint="Jika masalah berlanjut, beri tahu admin dan sebutkan waktu kejadiannya." />
