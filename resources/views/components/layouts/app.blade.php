@@ -79,27 +79,36 @@
         </div>
     </header>
 
-    {{-- Flash messages --}}
-    @if(session('error'))
-        <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 mt-4">
-            <div class="bg-tint border border-brand-deep/20 rounded-panel px-4 py-3 text-sm text-brand-deep" role="alert">
-                {{ session('error') }}
+    {{-- Flash messages (SweetAlert2 carrier + noscript fallback) --}}
+    @if(session('error') || session('warning') || session('success') || session('info') || session('status'))
+        <div
+            id="flash-alerts-data"
+            class="hidden"
+            @if(session('error')) data-error="{{ session('error') }}" @endif
+            @if(session('warning')) data-warning="{{ session('warning') }}" @endif
+            @if(session('success')) data-success="{{ session('success') }}" @endif
+            @if(session('info')) data-info="{{ session('info') }}" @endif
+            @if(session('status')) data-status="{{ session('status') }}" @endif
+        ></div>
+        <noscript>
+            <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 mt-4">
+                @if(session('error'))
+                    <div class="bg-tint border border-brand-deep/20 rounded-panel px-4 py-3 text-sm text-brand-deep" role="alert">
+                        {{ session('error') }}
+                    </div>
+                @endif
+                @if(session('warning'))
+                    <div class="bg-tint border border-brand/20 rounded-panel px-4 py-3 text-sm text-ink" role="alert">
+                        {{ session('warning') }}
+                    </div>
+                @endif
+                @if(session('success'))
+                    <div class="bg-pass/10 border border-pass/20 rounded-panel px-4 py-3 text-sm text-pass" role="alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
             </div>
-        </div>
-    @endif
-    @if(session('warning'))
-        <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 mt-4">
-            <div class="bg-tint border border-brand/20 rounded-panel px-4 py-3 text-sm text-ink" role="alert">
-                {{ session('warning') }}
-            </div>
-        </div>
-    @endif
-    @if(session('success'))
-        <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 mt-4">
-            <div class="bg-pass/10 border border-pass/20 rounded-panel px-4 py-3 text-sm text-pass" role="alert">
-                {{ session('success') }}
-            </div>
-        </div>
+        </noscript>
     @endif
 
     {{-- Main content --}}

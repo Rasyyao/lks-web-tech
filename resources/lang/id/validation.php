@@ -25,4 +25,16 @@ return [
     'file' => ':attribute harus berupa berkas.',
     'uploaded' => ':attribute gagal diunggah.',
     'current_password' => 'Password saat ini salah.',
+    'password' => [
+        'letters' => ':attribute harus mengandung setidaknya satu huruf.',
+        'mixed' => ':attribute harus mengandung minimal 1 huruf kapital dan 1 huruf kecil.',
+        'numbers' => ':attribute harus mengandung setidaknya satu angka.',
+        'symbols' => ':attribute harus mengandung minimal 1 simbol khusus.',
+        'uncompromised' => ':attribute yang diberikan telah muncul dalam kebocoran data.',
+    ],
+    'attributes' => [
+        'password' => 'Password baru',
+        'current_password' => 'Password saat ini',
+        'password_confirmation' => 'Konfirmasi password baru',
+    ],
 ];

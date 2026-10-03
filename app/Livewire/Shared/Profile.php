@@ -29,7 +29,12 @@ class Profile extends Component
         $user = Auth::user();
 
         $rules = [
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => [
+                'required',
+                'string',
+                Password::min(8)->letters()->mixedCase()->symbols(),
+                'confirmed',
+            ],
         ];
 
         // If not forced password change, require current password
@@ -38,7 +43,6 @@ class Profile extends Component
         }
 
         $this->validate($rules, [
-            'password.min' => __('auth.password_requirements'),
             'password.confirmed' => __('auth.password_mismatch'),
             'password.required' => __('validation.required', ['attribute' => 'Password baru']),
             'current_password.required' => __('validation.required', ['attribute' => 'Password saat ini']),
@@ -55,10 +59,8 @@ class Profile extends Component
         ]);
 
         AuditLog::record(
-            actorId: $user->id,
             action: 'user.password_changed',
             subject: $user,
-            ip: request()->ip()
         );
 
         session()->flash('success', __('auth.password_changed'));

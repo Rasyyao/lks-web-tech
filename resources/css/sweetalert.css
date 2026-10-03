@@ -1,0 +1,122 @@
+/* Custom SweetAlert2 Styling tailored to SMK Telkom Purwokerto Design Rules */
+
+.swal2-container {
+    z-index: 9999 !important;
+    font-family: var(--font-sans), system-ui, -apple-system, sans-serif !important;
+}
+
+/* Modal Popup */
+.swal2-popup.telkom-swal-popup {
+    border-radius: var(--radius-panel, 6px) !important;
+    border: 1px solid var(--color-rule, #D5D8DD) !important;
+    background: var(--color-sheet, #FFFFFF) !important;
+    color: var(--color-ink, #23272D) !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
+}
+
+.swal2-title.telkom-swal-title {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: var(--color-ink, #23272D) !important;
+    padding: 0 0 0.5rem 0 !important;
+}
+
+.swal2-html-container.telkom-swal-html {
+    font-size: 0.875rem !important;
+    color: var(--color-ink-muted, #5C636E) !important;
+    line-height: 1.5 !important;
+    margin: 0.5rem 0 1rem 0 !important;
+}
+
+/* Icons */
+.swal2-icon.swal2-success {
+    border-color: var(--color-pass, #17704A) !important;
+    color: var(--color-pass, #17704A) !important;
+}
+.swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: var(--color-pass, #17704A) !important;
+}
+.swal2-icon.swal2-success .swal2-success-ring {
+    border-color: rgba(23, 112, 74, 0.3) !important;
+}
+
+.swal2-icon.swal2-error {
+    border-color: var(--color-brand, #E31E24) !important;
+    color: var(--color-brand, #E31E24) !important;
+}
+.swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+    background-color: var(--color-brand, #E31E24) !important;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: var(--color-gold, #D9A82B) !important;
+    color: var(--color-gold-text, #8A6414) !important;
+}
+
+.swal2-icon.swal2-info {
+    border-color: var(--color-brand-deep, #B5121B) !important;
+    color: var(--color-brand-deep, #B5121B) !important;
+}
+
+/* Action Buttons */
+.swal2-actions.telkom-swal-actions {
+    gap: 0.5rem !important;
+    margin-top: 1.25rem !important;
+    padding-top: 0.75rem !important;
+}
+
+.swal2-confirm.telkom-swal-confirm {
+    background-color: var(--color-brand, #E31E24) !important;
+    color: #FFFFFF !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1.25rem !important;
+    border-radius: var(--radius-cell, 2px) !important;
+    border: none !important;
+    transition: background-color 0.15s ease !important;
+    box-shadow: none !important;
+}
+
+.swal2-confirm.telkom-swal-confirm:hover {
+    background-color: var(--color-brand-deep, #B5121B) !important;
+}
+
+.swal2-cancel.telkom-swal-cancel {
+    background-color: var(--color-sheet, #FFFFFF) !important;
+    color: var(--color-ink, #23272D) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    padding: 0.5rem 1.25rem !important;
+    border-radius: var(--radius-cell, 2px) !important;
+    border: 1px solid var(--color-rule, #D5D8DD) !important;
+    transition: all 0.15s ease !important;
+    box-shadow: none !important;
+}
+
+.swal2-cancel.telkom-swal-cancel:hover {
+    background-color: var(--color-paper, #F4F4F5) !important;
+    border-color: var(--color-ink-muted, #5C636E) !important;
+}
+
+/* Toast Variant */
+.swal2-popup.swal2-toast.telkom-swal-toast {
+    border-radius: var(--radius-panel, 6px) !important;
+    border: 1px solid var(--color-rule, #D5D8DD) !important;
+    background: var(--color-sheet, #FFFFFF) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    padding: 0.75rem 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.swal2-toast.telkom-swal-toast .swal2-title {
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    color: var(--color-ink, #23272D) !important;
+    margin: 0 !important;
+}
+
+.swal2-toast.telkom-swal-toast .swal2-timer-progress-bar {
+    background-color: var(--color-brand, #E31E24) !important;
+}

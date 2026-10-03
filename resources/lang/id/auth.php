@@ -19,7 +19,7 @@ return [
     'new_password' => 'Password baru',
     'confirm_password' => 'Konfirmasi password baru',
     'change_password' => 'Ubah password',
-    'password_requirements' => 'Password minimal 8 karakter.',
+    'password_requirements' => 'Password minimal 8 karakter, mengandung minimal 1 huruf kapital dan 1 simbol khusus.',
     'password_mismatch' => 'Konfirmasi password tidak cocok.',
     'current_password_wrong' => 'Password saat ini salah.',
     'first_login_notice' => 'Ini adalah login pertamamu. Ubah password untuk keamanan akun.',
