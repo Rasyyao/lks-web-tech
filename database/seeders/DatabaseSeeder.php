@@ -129,36 +129,75 @@ class DatabaseSeeder extends Seeder
         $putri->assignRole($studentRole);
         $putri->cohorts()->attach([$cohortRpl2->id]);
 
-        // 5. Topics
+        // 5. Topics (Categorized by Track: Client vs Server)
+        // Client-side Roadmap Topics
         $topicHtml = Topic::create([
-            'name' => 'HTML & Web Semantics',
+            'name' => 'HTML5 Foundation & Web Semantics',
             'slug' => 'html-semantics',
+            'track' => ModuleTrack::Client,
+            'description' => 'Struktur semantik dokumen, form validation native, accessibility (ARIA), SEO meta, dan elemen HTML5 modern.',
             'position' => 1,
         ]);
 
         $topicCss = Topic::create([
-            'name' => 'CSS, Flexbox & Grid Layout',
+            'name' => 'Modern CSS, Flexbox & Grid Layout',
             'slug' => 'css-layout',
+            'track' => ModuleTrack::Client,
+            'description' => 'Sistem tata letak CSS modern, Flexbox, CSS Grid, media queries responsif (mobile-first), dan komponen UI.',
             'position' => 2,
         ]);
 
-        $topicJs = Topic::create([
-            'name' => 'Modern JavaScript & DOM',
-            'slug' => 'javascript-dom',
+        $topicJsCore = Topic::create([
+            'name' => 'Modern JavaScript (ES6+) & Core Logic',
+            'slug' => 'javascript-core',
+            'track' => ModuleTrack::Client,
+            'description' => 'Sintaks ES6+ (arrow functions, destructuring, modules), array methods (map, filter, reduce), promise & async/await.',
             'position' => 3,
         ]);
 
-        $topicPhp = Topic::create([
-            'name' => 'PHP Backend Architecture',
-            'slug' => 'php-backend',
+        $topicDom = Topic::create([
+            'name' => 'JavaScript DOM Manipulation & Events',
+            'slug' => 'javascript-dom',
+            'track' => ModuleTrack::Client,
+            'description' => 'Seleksi dan manipulasi elemen DOM vanilla, dynamic rendering, event bubbling/delegation, serta Web Storage & Fetch API.',
             'position' => 4,
         ]);
 
-        $topicApi = Topic::create([
-            'name' => 'REST API, JSON & Database MySQL',
-            'slug' => 'rest-api-db',
-            'position' => 5,
+        // Server-side Roadmap Topics
+        $topicPhp = Topic::create([
+            'name' => 'PHP Fundamentals & OOP Architecture',
+            'slug' => 'php-backend',
+            'track' => ModuleTrack::Server,
+            'description' => 'Pemrograman PHP 8 modern, Object-Oriented Programming (Class, Interface, Trait), MVC pattern, dan security best practices.',
+            'position' => 1,
         ]);
+
+        $topicApi = Topic::create([
+            'name' => 'REST API Design & MySQL Database',
+            'slug' => 'rest-api-db',
+            'track' => ModuleTrack::Server,
+            'description' => 'Perancangan RESTful endpoints (GET/POST/PUT/DELETE), HTTP status code, format JSON terstandar, PDO, dan optimasi query MySQL.',
+            'position' => 2,
+        ]);
+
+        $topicLaravel = Topic::create([
+            'name' => 'Laravel Framework & Eloquent ORM',
+            'slug' => 'laravel-framework',
+            'track' => ModuleTrack::Server,
+            'description' => 'Routing, Controllers, Form Requests validation, Eloquent relationships & migrations, Middleware, dan Service layer.',
+            'position' => 3,
+        ]);
+
+        $topicVueReactAxios = Topic::create([
+            'name' => 'Frontend Integration (Vue / React & Axios)',
+            'slug' => 'vue-react-axios',
+            'track' => ModuleTrack::Server,
+            'description' => 'Konsumsi REST API backend dari frontend (Vue.js / React) menggunakan Axios, CORS handling, authentication token, dan reaktifitas state.',
+            'position' => 4,
+        ]);
+
+        // Alias for backwards compatibility in existing seeder questions
+        $topicJs = $topicDom;
 
         // 6. Materials
         Material::create([
@@ -238,6 +277,159 @@ Aspek penilaian keamanan pada Module A mencakup:
 - **Validasi input ketat** pada setiap request mutasi.
 - **Sanitasi output** untuk mencegah script eksekusi liar (XSS).
 - **Token CSRF** pada seluruh request bertipe POST, PUT, dan DELETE.
+MD,
+        ]);
+
+        Material::create([
+            'topic_id' => $topicApi->id,
+            'title' => 'Prinsip Perancangan RESTful API dan Struktur Database MySQL',
+            'level' => 2,
+            'position' => 1,
+            'body_md' => <<<'MD'
+Perancangan RESTful API yang konsisten merupakan poin krusial dalam penilaian LKS Web Technology Modul Server-Side.
+
+### 1. HTTP Methods & Resource Naming
+- `GET /api/v1/doctors`: Mengambil daftar data (plural noun).
+- `POST /api/v1/doctors`: Membuat resource dokter baru.
+- `GET /api/v1/doctors/{id}`: Mengambil detail satu dokter.
+- `PUT /api/v1/doctors/{id}`: Memperbarui seluruh field data dokter.
+- `DELETE /api/v1/doctors/{id}`: Menghapus resource dokter.
+
+### 2. Standar Response JSON
+Setiap endpoint API harus mengembalikan format payload yang seragam:
+
+```json
+{
+  "success": true,
+  "message": "Dokter berhasil ditambahkan",
+  "data": {
+    "id": 12,
+    "name": "dr. Andi Pratama, Sp.A",
+    "specialist": "Anak",
+    "created_at": "2026-10-03T10:00:00Z"
+  }
+}
+```
+MD,
+        ]);
+
+        Material::create([
+            'topic_id' => $topicLaravel->id,
+            'title' => 'Arsitektur Laravel: Routing, Form Request, dan Relasi Eloquent',
+            'level' => 3,
+            'position' => 1,
+            'body_md' => <<<'MD'
+Pada LKS Web Technology Modul Server-side (Module A), framework **Laravel** adalah fondasi utama untuk membangun backend API yang kokoh dan teruji.
+
+### 1. Resource Routing & Controller
+Gunakan controller yang tipis (*skinny controller*) dan pisahkan logika validasi ke Form Request:
+
+```php
+// routes/api.php
+Route::apiResource('consultations', ConsultationController::class);
+```
+
+### 2. Form Request Validation
+Pastikan validasi input dilakukan secara ketat sebelum menyentuh database:
+
+```php
+public function rules(): array
+{
+    return [
+        'patient_name' => ['required', 'string', 'max:255'],
+        'consultation_date' => ['required', 'date', 'after:today'],
+        'doctor_id' => ['required', 'exists:doctors,id'],
+    ];
+}
+```
+
+### 3. Eloquent Relationships
+Manfaatkan eager loading (`with()`) untuk mencegah masalah N+1 query:
+
+```php
+$consultations = Consultation::with(['doctor', 'patient'])
+    ->where('status', 'scheduled')
+    ->get();
+```
+MD,
+        ]);
+
+        Material::create([
+            'topic_id' => $topicVueReactAxios->id,
+            'title' => 'Integrasi API Frontend: Vue.js / React dengan Axios Client',
+            'level' => 3,
+            'position' => 1,
+            'body_md' => <<<'MD'
+Modul Server-side LKS sering menguji integrasi frontend (SPA menggunakan Vue atau React) yang mengonsumsi endpoint backend REST API via **Axios**.
+
+### 1. Inisialisasi Axios Client & Interceptors
+Konfigurasikan base URL dan header Authorization Bearer token secara terpusat:
+
+```javascript
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://127.0.0.1:8000/api/v1',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  },
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default api;
+```
+
+### 2. Fetching Data dan Penanganan Error
+Gunakan async/await dan tangani status code spesifik seperti 401 (Unauthenticated) dan 422 (Validation Error):
+
+```javascript
+async function fetchDoctors() {
+  try {
+    const response = await api.get('/doctors');
+    return response.data.data;
+  } catch (err) {
+    if (err.response?.status === 401) {
+      window.location.href = '/login';
+    }
+    throw err;
+  }
+}
+```
+MD,
+        ]);
+
+        Material::create([
+            'topic_id' => $topicJsCore->id,
+            'title' => 'JavaScript Modern (ES6+): Asynchronous, Promises & Array Methods',
+            'level' => 2,
+            'position' => 1,
+            'body_md' => <<<'MD'
+Kemampuan logika JavaScript modern tanpa library adalah kunci sukses dalam menyelesaikan Modul Client-side LKS.
+
+### 1. Array Transformation
+- `map()`: Mengubah setiap elemen menjadi elemen baru tanpa memutasi array asli.
+- `filter()`: Menyaring elemen berdasarkan kondisi boolean.
+- `reduce()`: Mengakumulasi array menjadi nilai tunggal.
+
+```javascript
+const scores = [85, 92, 78, 96, 88];
+const average = scores.reduce((sum, val) => sum + val, 0) / scores.length;
+```
+
+### 2. Destructuring & Spread Operator
+```javascript
+const user = { id: 1, name: 'Dewi', role: 'student' };
+const { name, ...rest } = user;
+const updatedUser = { ...user, active: true };
+```
 MD,
         ]);
 
@@ -433,6 +625,87 @@ MD,
                 'body' => 'Header HTTP apakah yang digunakan klien untuk menyatakan format data yang dikirim dalam request body (misal: application/json)?',
                 'answers' => ['Content-Type', 'content-type', 'Content-type'],
                 'explanation' => 'Header `Content-Type` menunjukkan media type dari isi request body.',
+            ],
+
+            // Laravel Framework
+            [
+                'topic' => $topicLaravel,
+                'type' => QuestionType::MultipleChoice,
+                'difficulty' => 3,
+                'points' => 15,
+                'body' => 'Fitur apakah di Laravel yang digunakan untuk memisahkan aturan validasi request dari controller secara terstruktur?',
+                'options' => [
+                    ['label' => 'Form Request', 'correct' => true],
+                    ['label' => 'Middleware', 'correct' => false],
+                    ['label' => 'Resource Collection', 'correct' => false],
+                    ['label' => 'Eloquent Scope', 'correct' => false],
+                ],
+                'explanation' => 'Form Request di Laravel adalah class khusus yang merangkum aturan validasi (`rules()`) dan otorisasi (`authorize()`) input HTTP.',
+            ],
+            [
+                'topic' => $topicLaravel,
+                'type' => QuestionType::TrueFalse,
+                'difficulty' => 2,
+                'points' => 10,
+                'body' => 'Perintah `Route::apiResource()` di Laravel secara otomatis mendaftarkan route create dan edit untuk rendering form HTML.',
+                'options' => [
+                    ['label' => 'Benar', 'correct' => false],
+                    ['label' => 'Salah', 'correct' => true],
+                ],
+                'explanation' => 'Salah. `apiResource()` sengaja mengecualikan route `create` dan `edit` karena keduanya hanya ditujukan untuk rendering halaman form HTML, bukan API.',
+            ],
+            [
+                'topic' => $topicLaravel,
+                'type' => QuestionType::ShortAnswer,
+                'difficulty' => 2,
+                'points' => 10,
+                'body' => 'Perintah Artisan apakah yang digunakan untuk membuat Model sekaligus file migration di Laravel?',
+                'answers' => ['php artisan make:model -m', 'make:model -m', 'php artisan make:model --migration'],
+                'explanation' => 'Opsi flag `-m` atau `--migration` memerintahkan Laravel membuat file migration tabel terkait bersamaan dengan pembuatan Model.',
+            ],
+
+            // Vue / React + Axios
+            [
+                'topic' => $topicVueReactAxios,
+                'type' => QuestionType::MultipleChoice,
+                'difficulty' => 3,
+                'points' => 15,
+                'body' => 'Header HTTP apakah yang digunakan klien Axios untuk mengirimkan token otentikasi Bearer ke backend API?',
+                'options' => [
+                    ['label' => 'Authorization: Bearer <token>', 'correct' => true],
+                    ['label' => 'Authentication: Token <token>', 'correct' => false],
+                    ['label' => 'X-Auth-Token: <token>', 'correct' => false],
+                    ['label' => 'Token: <token>', 'correct' => false],
+                ],
+                'explanation' => 'Standar HTTP Authorization menggunakan format `Authorization: Bearer <token>` untuk otentikasi token.',
+            ],
+            [
+                'topic' => $topicVueReactAxios,
+                'type' => QuestionType::TrueFalse,
+                'difficulty' => 2,
+                'points' => 10,
+                'body' => 'CORS (Cross-Origin Resource Sharing) harus dikonfigurasi dan diizinkan pada server backend agar request dari frontend SPA berbeda origin tidak diblokir browser.',
+                'options' => [
+                    ['label' => 'Benar', 'correct' => true],
+                    ['label' => 'Salah', 'correct' => false],
+                ],
+                'explanation' => 'Benar. Browser menerapkan kebijakan Same-Origin Policy (SOP), sehingga backend harus mengembalikan header CORS seperti `Access-Control-Allow-Origin`.',
+            ],
+
+            // JS Core
+            [
+                'topic' => $topicJsCore,
+                'type' => QuestionType::MultipleChoice,
+                'difficulty' => 2,
+                'points' => 10,
+                'body' => 'Kata kunci apakah di JavaScript ES6 yang digunakan untuk mendeklarasikan variabel yang nilainya tidak dapat di-reassign?',
+                'options' => [
+                    ['label' => 'const', 'correct' => true],
+                    ['label' => 'let', 'correct' => false],
+                    ['label' => 'var', 'correct' => false],
+                    ['label' => 'static', 'correct' => false],
+                ],
+                'explanation' => '`const` menciptakan variabel berlingkup blok (block-scoped) yang nilainya tidak dapat di-reassign setelah inisialisasi.',
             ],
         ];
 

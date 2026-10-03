@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\Topics\Schemas;
 
+use App\Enums\ModuleTrack;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
@@ -15,7 +18,7 @@ class TopicForm
         return $schema
             ->components([
                 Section::make('Topik')
-                    ->description('Pengelompokan bank soal & materi latihan (mis. HTML, CSS, JavaScript, REST API).')
+                    ->description('Pengelompokan silabus, roadmap & materi latihan (Modul Client-Side atau Server-Side).')
                     ->schema([
                         TextInput::make('name')
                             ->label('Nama topik')
@@ -32,6 +35,19 @@ class TopicForm
                             ->alphaDash()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
+                        Select::make('track')
+                            ->label('Jalur / Kategori Modul')
+                            ->options([
+                                ModuleTrack::Client->value => 'Client-side (HTML, CSS, JS, DOM, Canvas)',
+                                ModuleTrack::Server->value => 'Server-side (PHP, Laravel, REST API, Vue/React + Axios)',
+                            ])
+                            ->default(ModuleTrack::Client->value)
+                            ->required(),
+                        Textarea::make('description')
+                            ->label('Deskripsi / Ringkasan Silabus')
+                            ->placeholder('Kompetensi dan ruang lingkup materi yang diujikan dalam topik ini...')
+                            ->rows(2)
+                            ->maxLength(500),
                         TextInput::make('position')
                             ->label('Urutan')
                             ->numeric()

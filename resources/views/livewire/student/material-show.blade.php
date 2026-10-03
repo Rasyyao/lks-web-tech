@@ -8,8 +8,8 @@
 
 <div class="max-w-4xl mx-auto space-y-6">
     <div class="flex items-center justify-between">
-        <a href="{{ route('materials.index') }}" class="text-xs text-ink-muted hover:text-brand-deep inline-flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep">
-            ← Daftar Materi
+        <a href="{{ route('materials.index', ['jalur' => ($topic->track?->value ?? $topic->track) === 'server' ? 'server' : 'client']) }}" class="text-xs text-ink-muted hover:text-brand-deep inline-flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep">
+            ← Kembali ke Roadmap {{ ($topic->track?->value ?? $topic->track) === 'server' ? 'Modul Server-Side' : 'Modul Client-Side' }}
         </a>
 
         <x-button size="sm" :href="route('practice.start', ['topic' => $topic->id])">
@@ -18,12 +18,26 @@
     </div>
 
     <header class="space-y-2 border-b border-rule pb-4">
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center text-[10px] font-mono px-2 py-0.5 rounded-cell font-medium {{ ($topic->track?->value ?? $topic->track) === 'server' ? 'bg-brand/10 text-brand-deep' : 'bg-tint text-brand-deep' }}">
+                {{ ($topic->track?->value ?? $topic->track) === 'server' ? 'Modul Server-Side' : 'Modul Client-Side' }}
+            </span>
+            @if($topic->position)
+                <span class="text-xs text-ink-muted font-mono">Tahap {{ sprintf('%02d', $topic->position) }}</span>
+            @endif
+        </div>
         <h1 class="text-2xl sm:text-3xl font-bold text-ink">
             {{ $topic->name }}
         </h1>
-        <p class="text-xs text-ink-muted">
-            Materi Pembelajaran dan Referensi Teknis LKS Web Technologies
-        </p>
+        @if($topic->description)
+            <p class="text-sm text-ink-muted">
+                {{ $topic->description }}
+            </p>
+        @else
+            <p class="text-xs text-ink-muted">
+                Materi Pembelajaran dan Referensi Teknis LKS Web Technologies
+            </p>
+        @endif
     </header>
 
     @if($topic->materials->isEmpty())

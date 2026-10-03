@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Topics\Tables;
 use App\Filament\Actions\AuditedDeleteAction;
 use App\Models\Topic;
 use Filament\Actions\EditAction;
+use App\Enums\ModuleTrack;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -21,6 +23,10 @@ class TopicsTable
                     ->label('Topik')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('track')
+                    ->label('Jalur')
+                    ->badge()
+                    ->sortable(),
                 TextColumn::make('slug')
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -32,6 +38,14 @@ class TopicsTable
                     ->label('Materi')
                     ->counts('materials')
                     ->sortable(),
+            ])
+            ->filters([
+                SelectFilter::make('track')
+                    ->label('Jalur Modul')
+                    ->options([
+                        ModuleTrack::Client->value => 'Client-side',
+                        ModuleTrack::Server->value => 'Server-side',
+                    ]),
             ])
             ->defaultSort('position')
             ->reorderable('position')
