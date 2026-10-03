@@ -1,0 +1,21 @@
+@theme {
+    --color-*: initial; /* removes Tailwind's default palette, only school tokens exist */
+
+    --color-brand: #E31E24; /* provisional, sample from logo before freeze */
+    --color-brand-deep: #B5121B;
+    --color-ink: #23272D;
+    --color-ink-muted: #5C636E;
+    --color-paper: #F4F4F5;
+    --color-sheet: #FFFFFF;
+    --color-rule: #D5D8DD;
+    --color-pass: #17704A;
+    --color-gold: #D9A82B;
+    --color-gold-text: #8A6414;
+    --color-tint: #FDECEC;
+
+    --font-sans: "Schibsted Grotesk Variable", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+    --radius-cell: 2px;
+    --radius-panel: 6px;
+}

@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'site_name' => 'LKS Web Technology',
+    'school_name' => 'SMK Telkom Purwokerto',
+    'dashboard' => 'Beranda',
+    'modules' => 'Modul',
+    'practice' => 'Latihan',
+    'materials' => 'Materi',
+    'leaderboard' => 'Peringkat',
+    'profile' => 'Profil',
+    'admin' => 'Admin',
+    'mentor_inbox' => 'Pengumpulan',
+    'save' => 'Simpan',
+    'cancel' => 'Batal',
+    'delete' => 'Hapus',
+    'edit' => 'Edit',
+    'create' => 'Buat',
+    'back' => 'Kembali',
+    'search' => 'Cari',
+    'filter' => 'Filter',
+    'loading' => 'Memuat...',
+    'no_results' => 'Tidak ada hasil.',
+    'confirm_action' => 'Apakah kamu yakin?',
+    'changes_saved' => 'Perubahan disimpan.',
+    'error_occurred' => 'Terjadi kesalahan. Coba lagi.',
+];

@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@plugin "@tailwindcss/typography";
+
+@layer base {
+    body {
+        @apply bg-paper font-sans text-ink;
+    }
+
+    /* Tabular figures for scores, ranks, times */
+    .tabular-nums {
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+/* Markdown (briefs, soal, feedback) uses the school tokens */
+.prose {
+    --tw-prose-body: var(--color-ink);
+    --tw-prose-headings: var(--color-ink);
+    --tw-prose-links: var(--color-brand-deep);
+    --tw-prose-code: var(--color-ink);
+    --tw-prose-hr: var(--color-rule);
+}
+
+/* Code blocks in prose: light background with rule border, not dark terminal */
+.prose pre {
+    @apply bg-paper border border-rule rounded-cell font-mono;
+    color: var(--color-ink);
+}
+
+.prose code {
+    @apply font-mono;
+}

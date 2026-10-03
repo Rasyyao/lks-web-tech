@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'failed' => 'Username atau password salah.',
+    'password' => 'Password yang dimasukkan salah.',
+    'throttle' => 'Terlalu banyak percobaan. Coba lagi dalam :seconds detik.',
+    'account_inactive' => 'Akun kamu dinonaktifkan. Hubungi mentor untuk informasi lebih lanjut.',
+    'must_change_password' => 'Kamu harus mengubah password sebelum melanjutkan.',
+    'login' => 'Masuk',
+    'logout' => 'Keluar',
+    'username' => 'Username (NIS)',
+    'password' => 'Password',
+    'password_field' => 'Password',
+    'remember_me' => 'Ingat saya',
+    'forgot_password' => 'Lupa password? Hubungi mentor.',
+    'forgot_password_help' => 'Lupa password? Hubungi mentor.',
+    'password_changed' => 'Password berhasil diubah.',
+    'current_password' => 'Password saat ini',
+    'new_password' => 'Password baru',
+    'confirm_password' => 'Konfirmasi password baru',
+    'change_password' => 'Ubah password',
+    'password_requirements' => 'Password minimal 8 karakter.',
+    'password_mismatch' => 'Konfirmasi password tidak cocok.',
+    'current_password_wrong' => 'Password saat ini salah.',
+    'first_login_notice' => 'Ini adalah login pertamamu. Ubah password untuk keamanan akun.',
+];
