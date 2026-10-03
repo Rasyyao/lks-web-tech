@@ -7,13 +7,34 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+
 class UsersTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('username')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('email')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('roles.name')
+                    ->badge()
+                    ->label('Peran'),
+                IconColumn::make('is_active')
+                    ->boolean()
+                    ->label('Aktif'),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
