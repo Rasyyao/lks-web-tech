@@ -50,6 +50,9 @@
                             {{ __('general.mentor_inbox') }}
                         </x-nav-link>
                     @endif
+                    <x-nav-link href="{{ route('question-bank.index') }}" :active="request()->routeIs('question-bank.*')">
+                        Bank Soal
+                    </x-nav-link>
                     <x-nav-link href="{{ route('leaderboard') }}" :active="request()->routeIs('leaderboard')">
                         {{ __('general.leaderboard') }}
                     </x-nav-link>

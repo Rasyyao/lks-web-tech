@@ -1153,6 +1153,9 @@ MD,
             ],
         ]);
 
+        // 10. Question Bank Papers (Bank Soal LKS)
+        $this->call(QuestionBankSeeder::class);
+
         // Recompute leaderboard for seeded students
         $recomputeJob->forUser($dewi->id);
         $recomputeJob->forUser($raka->id);

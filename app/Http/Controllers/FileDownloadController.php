@@ -34,4 +34,18 @@ class FileDownloadController extends Controller
 
         return Storage::disk('private')->download($submission->path, $submission->original_name);
     }
+
+    /**
+     * Download a question bank PDF paper.
+     */
+    public function questionPaper(\App\Models\QuestionBankPaper $paper)
+    {
+        if (! Storage::disk('private')->exists($paper->file_path)) {
+            abort(404, 'Berkas PDF soal tidak ditemukan.');
+        }
+
+        $paper->increment('download_count');
+
+        return Storage::disk('private')->download($paper->file_path, $paper->file_name);
+    }
 }

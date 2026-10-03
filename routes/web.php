@@ -88,6 +88,9 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
             Route::get('/pengumpulan/{submission}', SubmissionReview::class)->name('mentor.submission.review');
         });
 
+    // Bank Soal LKS (accessible by all authenticated users)
+    Route::get('/bank-soal', \App\Livewire\Shared\QuestionBankIndex::class)->name('question-bank.index');
+
     /*
     |----------------------------------------------------------------------
     | File Downloads (policy-checked)
@@ -98,4 +101,6 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
         ->middleware('signed');
     Route::get('/unduh/pengumpulan/{submission}', [FileDownloadController::class, 'submission'])
         ->name('download.submission');
+    Route::get('/unduh/bank-soal/{paper}', [FileDownloadController::class, 'questionPaper'])
+        ->name('download.question-paper');
 });
