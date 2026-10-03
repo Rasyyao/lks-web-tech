@@ -8,7 +8,7 @@
 
 <div class="max-w-4xl mx-auto space-y-6">
     <div class="flex items-center justify-between">
-        <a href="{{ route('materials.index', ['jalur' => ($topic->track?->value ?? $topic->track) === 'server' ? 'server' : 'client']) }}" class="text-xs text-ink-muted hover:text-brand-deep inline-flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep">
+        <a href="{{ route('materials.roadmap', ['track' => ($topic->track?->value ?? $topic->track) === 'server' ? 'server' : 'client']) }}" class="text-xs text-ink-muted hover:text-brand-deep inline-flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep">
             ← Kembali ke Roadmap {{ ($topic->track?->value ?? $topic->track) === 'server' ? 'Modul Server-Side' : 'Modul Client-Side' }}
         </a>
 

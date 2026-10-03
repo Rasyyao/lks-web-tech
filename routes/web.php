@@ -7,6 +7,7 @@ use App\Livewire\Shared\Profile;
 use App\Livewire\Student\AnswerSheet;
 use App\Livewire\Student\Dashboard;
 use App\Livewire\Student\MaterialIndex;
+use App\Livewire\Student\MaterialRoadmap;
 use App\Livewire\Student\MaterialShow;
 use App\Livewire\Student\ModuleIndex;
 use App\Livewire\Student\ModuleShow;
@@ -76,6 +77,7 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
 
         // Materials
         Route::get('/materi', MaterialIndex::class)->name('materials.index');
+        Route::get('/materi/roadmap/{track}', MaterialRoadmap::class)->name('materials.roadmap');
         Route::get('/materi/{topic:slug}', MaterialShow::class)->name('materials.show');
     });
 

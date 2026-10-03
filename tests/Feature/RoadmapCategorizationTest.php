@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\ModuleTrack;
 use App\Livewire\Student\MaterialIndex;
+use App\Livewire\Student\MaterialRoadmap;
 use App\Models\Topic;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
@@ -29,45 +30,49 @@ class RoadmapCategorizationTest extends TestCase
         $this->actingAs($this->student)
             ->get('/materi')
             ->assertOk()
-            ->assertSee('Roadmap Pembelajaran')
-            ->assertSee('Silabus LKS')
+            ->assertSee('Modul')
+            ->assertSee('Roadmap LKS Web Technologies')
             ->assertSee('Modul Client-Side')
             ->assertSee('Modul Server-Side')
-            ->assertSee('HTML5 Foundation & Web Semantics')
-            ->assertSee('Modern CSS, Flexbox & Grid Layout');
+            ->assertSee(route('materials.roadmap', 'client'))
+            ->assertSee(route('materials.roadmap', 'server'));
     }
 
-    public function test_default_track_is_client_and_displays_client_roadmap(): void
+    public function test_client_roadmap_page_renders_client_topics_and_steps(): void
     {
-        Livewire::actingAs($this->student)
-            ->test(MaterialIndex::class)
-            ->assertSet('activeTrack', 'client')
-            ->assertSee('Modul Client-Side')
+        $this->actingAs($this->student)
+            ->get('/materi/roadmap/client')
+            ->assertOk()
+            ->assertSee('Roadmap Pembelajaran: Modul Client-Side')
             ->assertSee('HTML5 Foundation & Web Semantics')
             ->assertSee('Modern CSS, Flexbox & Grid Layout')
-            ->assertSee('JavaScript DOM Manipulation & Events');
+            ->assertSee('Modern JavaScript (ES6+) & Core Logic')
+            ->assertSee('JavaScript DOM Manipulation & Events')
+            ->assertSee('Kembali ke Pilihan Modul');
     }
 
-    public function test_switching_track_to_server_displays_server_roadmap(): void
+    public function test_server_roadmap_page_renders_server_topics_and_steps(): void
     {
-        Livewire::actingAs($this->student)
-            ->test(MaterialIndex::class)
-            ->call('setTrack', 'server')
-            ->assertSet('activeTrack', 'server')
-            ->assertSee('Modul Server-Side')
+        $this->actingAs($this->student)
+            ->get('/materi/roadmap/server')
+            ->assertOk()
+            ->assertSee('Roadmap Pembelajaran: Modul Server-Side')
             ->assertSee('PHP Fundamentals & OOP Architecture')
             ->assertSee('REST API Design & MySQL Database')
             ->assertSee('Laravel Framework & Eloquent ORM')
-            ->assertSee('Frontend Integration (Vue / React & Axios)');
+            ->assertSee('Frontend Integration (Vue / React & Axios)')
+            ->assertSee('Kembali ke Pilihan Modul');
     }
 
-    public function test_query_parameter_sets_initial_active_track(): void
+    public function test_query_parameter_redirects_to_dedicated_roadmap_page(): void
     {
         $this->actingAs($this->student)
             ->get('/materi?jalur=server')
-            ->assertOk()
-            ->assertSee('Laravel Framework & Eloquent ORM')
-            ->assertSee('Frontend Integration (Vue / React & Axios)');
+            ->assertRedirect(route('materials.roadmap', ['track' => 'server']));
+
+        $this->actingAs($this->student)
+            ->get('/materi?jalur=client')
+            ->assertRedirect(route('materials.roadmap', ['track' => 'client']));
     }
 
     public function test_material_show_displays_topic_detail_and_back_link_to_correct_track(): void
@@ -80,7 +85,7 @@ class RoadmapCategorizationTest extends TestCase
             ->assertSee('Laravel Framework & Eloquent ORM')
             ->assertSee('Modul Server-Side')
             ->assertSee('Kembali ke Roadmap Modul Server-Side')
-            ->assertSee(route('materials.index', ['jalur' => 'server']));
+            ->assertSee(route('materials.roadmap', ['track' => 'server']));
     }
 
     public function test_topic_model_casts_track_to_module_track_enum(): void
