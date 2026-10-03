@@ -72,17 +72,6 @@
         </div>
 
         <form wire:submit="updatePassword" class="space-y-4 border-t border-rule pt-4">
-            @if(! $user->must_change_password)
-                <x-field
-                    :label="__('auth.current_password')"
-                    id="current_password"
-                    type="password"
-                    wire:model="current_password"
-                    :error="$errors->first('current_password')"
-                    :required="true"
-                    autocomplete="current-password"
-                />
-            @endif
 
             <x-field
                 :label="__('auth.new_password')"

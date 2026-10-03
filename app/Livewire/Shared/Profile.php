@@ -14,7 +14,6 @@ use Livewire\Component;
 #[Title('Profil')]
 class Profile extends Component
 {
-    public string $current_password = '';
     public string $password = '';
     public string $password_confirmation = '';
     public bool $isPasswordMode = false;
@@ -37,21 +36,10 @@ class Profile extends Component
             ],
         ];
 
-        // If not forced password change, require current password
-        if (! $user->must_change_password) {
-            $rules['current_password'] = ['required', 'string'];
-        }
-
         $this->validate($rules, [
             'password.confirmed' => __('auth.password_mismatch'),
             'password.required' => __('validation.required', ['attribute' => 'Password baru']),
-            'current_password.required' => __('validation.required', ['attribute' => 'Password saat ini']),
         ]);
-
-        if (! $user->must_change_password && ! Hash::check($this->current_password, $user->password)) {
-            $this->addError('current_password', __('auth.current_password_wrong'));
-            return;
-        }
 
         $user->update([
             'password' => Hash::make($this->password),

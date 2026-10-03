@@ -80,4 +80,29 @@ class ProfileTest extends TestCase
             'subject_id' => $user->id,
         ]);
     }
+
+    public function test_user_does_not_need_to_input_current_password(): void
+    {
+        // Dewi has must_change_password = false
+        $dewi = User::where('username', '541221001')->firstOrFail();
+        $this->assertFalse((bool) $dewi->must_change_password);
+
+        // The current password field is not shown on the page
+        $this->actingAs($dewi)
+            ->get('/profil/password')
+            ->assertOk()
+            ->assertDontSee('Password saat ini');
+
+        // Dewi can change password without providing current_password
+        Livewire::actingAs($dewi)
+            ->test(Profile::class)
+            ->set('password', 'BaruTelkom2026@')
+            ->set('password_confirmation', 'BaruTelkom2026@')
+            ->call('updatePassword')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('dashboard'));
+
+        $dewi->refresh();
+        $this->assertTrue(Hash::check('BaruTelkom2026@', $dewi->password));
+    }
 }
