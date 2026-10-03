@@ -2,7 +2,10 @@
 
 namespace App\Enums;
 
-enum CompetitionLevel: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum CompetitionLevel: string implements HasColor, HasLabel
 {
     case Kabupaten = 'kabupaten';
     case Provinsi = 'provinsi';
@@ -32,6 +35,20 @@ enum CompetitionLevel: string
             self::Kabupaten => 'bg-paper text-ink border-rule',
             self::Provinsi => 'bg-gold/15 text-gold-text border-gold/30',
             self::Nasional => 'bg-tint text-brand-deep border-brand-deep/30 font-bold',
+        };
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label();
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::Kabupaten => 'gray',
+            self::Provinsi => 'warning',
+            self::Nasional => 'primary',
         };
     }
 }

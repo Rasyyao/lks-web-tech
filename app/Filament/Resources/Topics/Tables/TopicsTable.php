@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\Topics\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class TopicsTable
@@ -13,18 +12,29 @@ class TopicsTable
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('position')
+                    ->label('#')
+                    ->sortable(),
+                TextColumn::make('name')
+                    ->label('Topik')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('slug')
+                    ->color('gray')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('questions_count')
+                    ->label('Soal')
+                    ->counts('questions')
+                    ->sortable(),
+                TextColumn::make('materials_count')
+                    ->label('Materi')
+                    ->counts('materials')
+                    ->sortable(),
             ])
-            ->filters([
-                //
-            ])
+            ->defaultSort('position')
+            ->reorderable('position')
             ->recordActions([
                 EditAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }

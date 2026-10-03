@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Topics;
 use App\Filament\Resources\Topics\Pages\CreateTopic;
 use App\Filament\Resources\Topics\Pages\EditTopic;
 use App\Filament\Resources\Topics\Pages\ListTopics;
+use App\Filament\Resources\Topics\RelationManagers\MaterialsRelationManager;
 use App\Filament\Resources\Topics\Schemas\TopicForm;
 use App\Filament\Resources\Topics\Tables\TopicsTable;
 use App\Models\Topic;
@@ -13,12 +14,23 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class TopicResource extends Resource
 {
     protected static ?string $model = Topic::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Latihan';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $modelLabel = 'topik';
+
+    protected static ?string $pluralModelLabel = 'Topik';
+
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema
     {
@@ -33,7 +45,7 @@ class TopicResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            MaterialsRelationManager::class,
         ];
     }
 

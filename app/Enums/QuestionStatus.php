@@ -2,7 +2,10 @@
 
 namespace App\Enums;
 
-enum QuestionStatus: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum QuestionStatus: string implements HasColor, HasLabel
 {
     case Draft = 'draft';
     case Review = 'review';
@@ -16,6 +19,21 @@ enum QuestionStatus: string
             self::Review => 'Menunggu review',
             self::Published => 'Terbit',
             self::Archived => 'Diarsipkan',
+        };
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label();
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::Draft => 'gray',
+            self::Review => 'info',
+            self::Published => 'success',
+            self::Archived => 'warning',
         };
     }
 }

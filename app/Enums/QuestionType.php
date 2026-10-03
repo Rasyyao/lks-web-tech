@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum QuestionType: string
+use Filament\Support\Contracts\HasLabel;
+
+enum QuestionType: string implements HasLabel
 {
     case MultipleChoice = 'multiple_choice';
     case TrueFalse = 'true_false';
@@ -15,5 +17,10 @@ enum QuestionType: string
             self::TrueFalse => 'Benar/Salah',
             self::ShortAnswer => 'Jawaban singkat',
         };
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label();
     }
 }

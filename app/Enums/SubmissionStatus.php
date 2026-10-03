@@ -2,7 +2,10 @@
 
 namespace App\Enums;
 
-enum SubmissionStatus: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum SubmissionStatus: string implements HasColor, HasLabel
 {
     case Received = 'received';
     case Graded = 'graded';
@@ -14,6 +17,20 @@ enum SubmissionStatus: string
             self::Received => 'Diterima',
             self::Graded => 'Sudah dinilai',
             self::Rejected => 'Ditolak',
+        };
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label();
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::Received => 'info',
+            self::Graded => 'success',
+            self::Rejected => 'danger',
         };
     }
 }
