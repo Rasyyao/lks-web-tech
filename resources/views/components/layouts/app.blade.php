@@ -13,7 +13,7 @@
 <body class="min-h-screen bg-paper text-ink font-sans antialiased">
     {{-- Header --}}
     <header class="bg-sheet border-b-[3px] border-brand">
-        <div class="mx-auto max-w-6xl px-4 flex items-center justify-between h-14 sm:h-16">
+        <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14 sm:h-16">
             {{-- Logo and school name --}}
             <a href="{{ auth()->check() ? route('dashboard') : route('login') }}" class="flex items-center gap-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep">
                 @if(file_exists(public_path('brand/logo-smk-telkom-purwokerto.png')))
@@ -78,21 +78,21 @@
 
     {{-- Flash messages --}}
     @if(session('error'))
-        <div class="mx-auto max-w-6xl px-4 mt-4">
+        <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 mt-4">
             <div class="bg-tint border border-brand-deep/20 rounded-panel px-4 py-3 text-sm text-brand-deep" role="alert">
                 {{ session('error') }}
             </div>
         </div>
     @endif
     @if(session('warning'))
-        <div class="mx-auto max-w-6xl px-4 mt-4">
+        <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 mt-4">
             <div class="bg-tint border border-brand/20 rounded-panel px-4 py-3 text-sm text-ink" role="alert">
                 {{ session('warning') }}
             </div>
         </div>
     @endif
     @if(session('success'))
-        <div class="mx-auto max-w-6xl px-4 mt-4">
+        <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 mt-4">
             <div class="bg-pass/10 border border-pass/20 rounded-panel px-4 py-3 text-sm text-pass" role="alert">
                 {{ session('success') }}
             </div>
@@ -100,13 +100,13 @@
     @endif
 
     {{-- Main content --}}
-    <main class="mx-auto max-w-6xl px-4 py-6 sm:py-8">
+    <main class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {{ $slot }}
     </main>
 
     {{-- Footer --}}
     <footer class="border-t border-rule mt-auto">
-        <div class="mx-auto max-w-6xl px-4 py-6 text-sm text-ink-muted">
+        <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6 text-sm text-ink-muted">
             {{ __('general.school_name') }} — {{ __('general.site_name') }}
         </div>
     </footer>

@@ -475,64 +475,489 @@ MD,
         // 8. Modules A and B
         $moduleA = Module::create([
             'slug' => 'modul-a-server-side-api',
-            'title' => 'Modul A: Server-Side RESTful API Development',
+            'title' => 'Server Side Module: PintarMenabung (REST API & Frontend Integration)',
             'track' => ModuleTrack::Server,
             'level' => 3,
-            'summary' => 'Membangun layanan REST API dengan otentikasi JWT, validasi input, serta pengelolaan relasi data berbasis PHP & MySQL.',
+            'summary' => 'Membangun sistem backend REST API berbasis Laravel Sanctum (Phase 1) dan aplikasi frontend terintegrasi berbasis Vue/React/Bootstrap 5 & Axios (Phase 2) dengan pengujian otomatis Postman dan Playwright.',
             'brief_md' => <<<'MD'
-# Deskripsi Tugas Modul A
+# Deskripsi Tugas: PintarMenabung (Financial Management Application)
 
-Sebagai backend developer pada seleksi LKS Web Technologies, kamu diminta untuk mengimplementasikan RESTful API untuk sistem peminjaman inventaris sekolah.
+Sebagai peserta seleksi LKS Web Technologies, kamu diminta untuk membangun sistem pengelolaan keuangan pribadi bernama **PintarMenabung** yang terdiri atas **2 Fase Utama**:
+1. **Fase 1 - Backend Development (REST API)** menggunakan Framework Laravel dan otentikasi Laravel Sanctum.
+2. **Fase 2 - Frontend Web Application** menggunakan Framework JavaScript pilihan (**React** atau **Vue**, atau **Vanilla JS**) dengan styling **Bootstrap 5**, pemanggilan data via **Axios**, dan visualisasi grafik **Chart.js**.
 
-## Kebutuhan Fungsional
-1. **Otentikasi**:
-   - `POST /api/v1/auth/login`: login menggunakan NIS dan password, mengembalikan access token.
-   - `POST /api/v1/auth/logout`: membatalkan token yang aktif.
-2. **Katalog Barang**:
-   - `GET /api/v1/items`: daftar barang dengan pagination, filter kategori, dan pencarian nama.
-   - `POST /api/v1/items`: menambah barang baru (khusus peran admin/petugas).
-3. **Peminjaman**:
-   - `POST /api/v1/loans`: mengajukan peminjaman dengan daftar barang dan tanggal kembali.
-   - Stok barang harus berkurang saat peminjaman disetujui dalam transaksi database atomik.
+> 💡 **Informasi Basis Data**:
+> Kamu **TIDAK PERLU** membuat file migrasi database dari nol! File SQL Dump (`pintar_menabung.sql`) telah disediakan pada tab **Paket Aset & Starter Kit**. Kamu cukup mengimpor dump SQL tersebut ke database lokal kamu (`mysql -u root -p pintar_menabung < pintar_menabung.sql` atau menggunakan SQLite/DB client).
+
+---
+
+## FASE 1: SPESIFIKASI BACKEND REST API
+
+Seluruh endpoint API berada di bawah prefix `/api`. Semua response wajib menyertakan header `Content-Type: application/json` dan format JSON konsisten.
+
+### A. Otentikasi Pengguna (Sanctum)
+
+#### `POST /api/auth/register`
+- **Tujuan**: Mendaftarkan pengguna baru ke dalam aplikasi.
+- **Request Headers**: `Accept: application/json`
+- **Body (JSON)**:
+  - `full_name`: string, required
+  - `email`: string, required, format email valid, unique
+  - `password`: string, required, minimal 6 karakter
+- **Response Berhasil (201 Created)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Registration successful",
+    "data": {
+      "id": 6,
+      "name": "Dedi",
+      "email": "dedi@webtech.id",
+      "token": "1|wwuOrgoVe4Xyj5dvUmnf6WTPTaA...",
+      "created_at": "2025-07-11T16:01:46.000000Z",
+      "updated_at": "2025-07-11T16:01:46.000000Z"
+    }
+  }
+  ```
+- **Response Validasi Gagal (422 Unprocessable Entity)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Invalid field",
+    "errors": {
+      "name": ["The name field is required."],
+      "email": ["The email has already been taken."],
+      "password": ["The password field must be at least 6 characters."]
+    }
+  }
+  ```
+
+#### `POST /api/auth/login`
+- **Tujuan**: Masuk ke aplikasi menggunakan email dan kata sandi.
+- **Request Headers**: `Accept: application/json`
+- **Body (JSON)**:
+  - `email`: string, required
+  - `password`: string, required
+- **Response Berhasil (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Login successful",
+    "data": {
+      "id": 1,
+      "name": "Budi",
+      "email": "budi@webtech.id",
+      "token": "2|0Q2TAdua0FOslp1F4cxfkrzQgkp...",
+      "created_at": "2025-07-11T16:01:38.000000Z",
+      "updated_at": "2025-07-11T16:01:38.000000Z"
+    }
+  }
+  ```
+- **Response Gagal (401 Unauthorized)**:
+  ```json
+  {
+    "status": "error",
+    "message": "Username or password incorrect"
+  }
+  ```
+
+#### `POST /api/auth/logout`
+- **Tujuan**: Keluar dari aplikasi dan menonaktifkan token perangkat aktif saat ini.
+- **Request Headers**: `Accept: application/json`, `Authorization: Bearer <TOKEN>`
+- **Response Berhasil (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Logout successful"
+  }
+  ```
+
+---
+
+### B. Mata Uang & Kategori (Currency & Category)
+
+Kategori digunakan untuk mengelompokkan transaksi dengan 2 tipe:
+- `INCOME`: Menambah saldo dompet (misal: gaji, bonus, transfer masuk)
+- `EXPENSE`: Mengurangi saldo dompet (misal: belanja, makan/minum, tagihan)
+
+#### `GET /api/currencies`
+- **Tujuan**: Mengambil seluruh mata uang yang tersedia.
+- **Headers**: `Accept: application/json`, `Authorization: Bearer <TOKEN>`
+- **Response Berhasil (200 OK)**:
+  ```json
+  {
+    "message": "Get all currencies successful",
+    "data": {
+      "currencies": [
+        { "id": 1, "name": "US Dollar", "symbol": "$", "code": "USD" },
+        { "id": 2, "name": "Indonesian Rupiah", "symbol": "Rp", "code": "IDR" }
+      ]
+    }
+  }
+  ```
+
+#### `GET /api/categories`
+- **Tujuan**: Mengambil seluruh kategori transaksi.
+- **Headers**: `Accept: application/json`, `Authorization: Bearer <TOKEN>`
+- **Response Berhasil (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Get all categories successful",
+    "data": {
+      "categories": [
+        {
+          "id": 1,
+          "name": "Outgoing Transfer",
+          "icon": "💸",
+          "type": "EXPENSE"
+        }
+      ]
+    }
+  }
+  ```
+
+---
+
+### C. Pengelolaan Dompet (Wallet)
+
+Saldo dompet (*balance*) dihitung secara otomatis dan akurat dari seluruh transaksi terkait:
+$$\text{balance} = \sum(\text{INCOME}) - \sum(\text{EXPENSE})$$
+
+#### `POST /api/wallets`
+- **Tujuan**: Menambahkan dompet baru untuk pengguna yang login.
+- **Headers**: `Accept: application/json`, `Authorization: Bearer <TOKEN>`
+- **Body (JSON)**:
+  - `name`: string, required
+  - `currency_code`: string, required, valid currency_code data
+- **Response Berhasil (201 Created)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Wallet added successful",
+    "data": {
+      "id": 26,
+      "name": "Savings",
+      "user_id": 1,
+      "currency_code": "IDR"
+    }
+  }
+  ```
+
+#### `PUT /api/wallets/:walletId`
+- **Tujuan**: Memperbarui nama dompet milik sendiri.
+- **Headers**: `Accept: application/json`, `Authorization: Bearer <TOKEN>`
+- **Body (JSON)**: `name`: string, required
+- **Response Berhasil (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Wallet updated successful",
+    "data": {
+      "id": 1,
+      "user_id": 1,
+      "name": "Cash IDR",
+      "currency_code": "IDR"
+    }
+  }
+  ```
+- **Response Not Found (404)**: `{"status": "error", "message": "Not found"}`
+- **Response Forbidden (403)**: `{"status": "error", "message": "Forbidden access"}`
+
+#### `DELETE /api/wallets/:walletId`
+- **Tujuan**: Menghapus dompet milik sendiri.
+- **Headers**: `Accept: application/json`, `Authorization: Bearer <TOKEN>`
+- **Response Berhasil (200 OK)**: `{"status": "success", "message": "Wallet deleted successful"}`
+
+#### `GET /api/wallets`
+- **Tujuan**: Mengambil seluruh daftar dompet milik pengguna dengan saldo (`balance`) terhitung otomatis.
+- **Headers**: `Accept: application/json`, `Authorization: Bearer <TOKEN>`
+- **Response Berhasil (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Get all wallets successful",
+    "data": {
+      "wallets": [
+        {
+          "id": 2,
+          "user_id": 1,
+          "name": "Bank",
+          "currency_code": "IDR",
+          "balance": 12250000
+        }
+      ]
+    }
+  }
+  ```
+
+#### `GET /api/wallets/:walletId`
+- **Tujuan**: Mengambil rincian dompet spesifik beserta saldo terkini.
+- **Response Berhasil (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Get detail wallet successful",
+    "data": {
+      "id": 1,
+      "user_id": 1,
+      "name": "Cash IDR",
+      "currency_code": "IDR",
+      "balance": 4865000
+    }
+  }
+  ```
+
+---
+
+### D. Transaksi Keuangan (Transaction)
+
+Setiap transaksi harus terhubung ke dompet (`wallet_id`) dan kategori (`category_id`).
+
+#### `POST /api/transactions`
+- **Tujuan**: Menambahkan catatan transaksi baru.
+- **Headers**: `Accept: application/json`, `Authorization: Bearer <TOKEN>`
+- **Body (JSON)**:
+  - `wallet_id`: integer, required, valid wallet_id data
+  - `category_id`: integer, required, valid category_id data
+  - `amount`: integer, required, greater or equal 1
+  - `date`: string, required, date format "Y-m-d" (contoh: "2025-07-31")
+  - `note`: string, optional
+- **Response Berhasil (201 Created)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Transaction added successful",
+    "data": {
+      "id": 842,
+      "wallet_id": 1,
+      "category_id": 3,
+      "amount": 50000,
+      "note": "starbucks",
+      "date": "2025-07-31"
+    }
+  }
+  ```
+
+#### `DELETE /api/transactions/:transactionId`
+- **Tujuan**: Menghapus transaksi (otomatis mengoreksi saldo dompet).
+- **Response Berhasil (200 OK)**: `{"status": "success", "message": "Transaction deleted successful"}`
+
+#### `GET /api/transactions`
+- **Tujuan**: Mengambil riwayat transaksi pengguna, terurut berdasarkan tanggal transaksi secara descending (`date DESC`).
+- **Query Parameters**:
+  - `page`: integer, optional, default 1
+  - `per_page`: integer, optional, default 25
+  - `month`: integer, optional (1 - 12)
+  - `year`: integer, optional (misal: 2025)
+- **Response Berhasil (200 OK)**:
+  ```json
+  {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 842,
+        "amount": 50000,
+        "note": "starbucks",
+        "date": "2025-07-31",
+        "wallet": { "id": 1, "name": "Savings IDR", "currency_code": "IDR" },
+        "category": { "id": 3, "name": "Food & Drinks", "icon": "🍔", "type": "EXPENSE" }
+      }
+    ],
+    "from": 1,
+    "last_page": 170,
+    "per_page": 25,
+    "to": 25,
+    "total": 170
+  }
+  ```
+
+---
+
+### E. Laporan Keuangan (Financial Report)
+
+#### `GET /api/reports/summary-by-category/expense`
+- **Tujuan**: Mengambil ringkasan akumulasi nominal per kategori pengeluaran per bulan.
+- **Query Parameters**: `month` (1-12), `year` (misal: 2025)
+- **Response Berhasil (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Get summary by expense category successful",
+    "data": {
+      "summary": [
+        {
+          "category": {
+            "id": 13,
+            "name": "Groceries",
+            "icon": "🛒",
+            "color": "#55EFC4",
+            "type": "EXPENSE"
+          },
+          "amount": 50000
+        }
+      ]
+    }
+  }
+  ```
+
+#### `GET /api/reports/summary-by-category/income`
+- **Tujuan**: Mengambil ringkasan pemasukan per kategori per bulan.
+- **Response Berhasil (200 OK)**:
+  ```json
+  {
+    "status": "success",
+    "message": "Get summary by income category successful",
+    "data": {
+      "summary": [
+        {
+          "category": {
+            "id": 2,
+            "name": "Incoming Transfer",
+            "icon": "💰",
+            "color": "#00B894",
+            "type": "INCOME"
+          },
+          "amount": 1050000
+        }
+      ]
+    }
+  }
+  ```
+
+---
+
+## FASE 2: PANDUAN PENGEMBANGAN FRONTEND
+
+Aplikasi web frontend dibangun menggunakan template Bootstrap 5 dengan konsumsi API melalui library **Axios**.
+
+### 1. Halaman & Spesifikasi Fitur
+
+1. **Aturan Umum (General)**:
+   - Judul dokumen browser (`document.title`) harus mencerminkan halaman yang sedang dibuka (misal: `"Login - PintarMenabung"`, `"Overview - PintarMenabung"`).
+   - Saat pengguna berhasil login, tampilkan tombol **Logout** di navbar. Klik logout akan memanggil endpoint logout dan menghapus token.
+
+2. **Halaman Register (`/register` atau `register.html`)**:
+   - Form input: Full Name, Email, Password.
+   - Tampilkan pesan error spesifik di bawah field jika validasi gagal.
+   - Redirect otomatis ke halaman **Overview** setelah registrasi berhasil.
+   - Jika pengguna yang sudah login membuka halaman ini, redirect langsung ke Overview.
+
+3. **Halaman Login (`/login` atau `login.html`)**:
+   - Form input: Email dan Password.
+   - Tampilkan pesan error jika login gagal.
+   - Redirect otomatis ke **Overview** jika login berhasil atau jika sudah memiliki sesi login.
+
+4. **Halaman Utama / Overview (`/` atau `index.html`)**:
+   - Hanya dapat diakses oleh user yang sudah login.
+   - **Daftar Dompet (User Wallets)**: Menampilkan nama dompet dan saldo saat ini dengan format mata uang (misal: `IDR 5,190,000`).
+   - **Daftar Transaksi Terbaru (Recent Transactions)**:
+     - Format tanggal ramah pembaca (misal: `"Jul 31, 2025"`).
+     - Tanggal hanya ditampilkan sekali per kelompok tanggal (sembunyikan jika tanggal sama dengan transaksi sebelumnya).
+     - Kategori dengan ikon & warna: **Merah** untuk pengeluaran dengan tanda minus (`- IDR 50,000`), **Hijau** untuk pemasukan dengan tanda plus (`+ IDR 2,500,000`).
+   - Tombol **+ Add Wallet** di bawah seksi balance untuk memunculkan modal tambah dompet.
+   - Tombol **+ Add Transaction** untuk mencatat transaksi baru.
+   - **Hapus Transaksi**: Double-click pada item transaksi untuk menampilkan dialog konfirmasi penghapusan.
+
+5. **Halaman Detail Wallet (`/wallets/:walletId` atau `wallet-detail.html`)**:
+   - Menampilkan nama wallet dan saldo kalkulasi terkini.
+   - **Edit Nama Dompet**: Klik pada nama dompet, ubah nama, lalu tekan tombol `Enter` untuk menyimpan ke API.
+   - **Hapus Dompet**: Klik nama dompet, kosongkan input teks, lalu tekan `Enter` untuk menampilkan dialog konfirmasi penghapusan.
+   - **Filter Transaksi**: Filter per bulan (1–12) dan tahun (rentang pilihan 2015 sampai 2030).
+   - **Diagram Donat (Chart.js Doughnut)**: Menampilkan proporsi pengeluaran & pemasukan dari endpoint `/api/reports/summary-by-category/*` dengan label kategori di bagian bawah.
+   - **Transfer Uang**: Tombol "Transfer Money" dengan dompet asal terisi otomatis sesuai dompet aktif saat ini.
+   - Double-click transaksi untuk menghapus item transaksi.
+
+### 2. Pintasan Keyboard (Shortcuts)
+| Tombol Shortcut | Fungsi / Aksi |
+| :--- | :--- |
+| `Alt + W` | Membuka form modal **"Add Wallet"** |
+| `Alt + N` | Membuka form modal **"Add Transaction"** |
+| `Alt + T` | Membuka form modal **"Transfer Money"** |
+| `Esc` | Menutup form modal yang sedang aktif |
+
+### 3. Konfigurasi Axios & Base URL
+Atur base URL API di satu lokasi terpusat:
+```javascript
+const apiUrl = 'http://localhost:8000/api'; // atau via VITE_API_URL
+```
+Sertakan Bearer token secara otomatis pada setiap request menggunakan Axios Request Interceptor.
 MD,
             'rules_md' => <<<'MD'
-## Aturan Teknis
-- Seluruh response wajib mengembalikan format JSON standar `{ "status": "success|error", "data": ... }`.
-- Gunakan HTTP Status Codes yang sesuai: 200, 201, 400, 401, 403, 404, 422.
-- Semua query mutasi wajib diamankan dari SQL Injection.
-- Buat file `.zip` berisi kode sumber proyek dan dump database `database.sql`.
+## Aturan Teknis & Instruksi Pengumpulan LKS
+
+1. **Integritas Endpoint & Struktur Response**:
+   - Dilarang membuat endpoint baru di luar spesifikasi resmi.
+   - Anda diperbolehkan menambahkan atribut tambahan pada response body jika diperlukan, namun seluruh atribut wajib pada spesifikasi JSON harus ada dan tipe datanya sesuai.
+2. **Kepatuhan Status Code HTTP**:
+   - `201 Created` untuk pembuatan data baru (Register, Add Wallet, Add Transaction).
+   - `200 OK` untuk pembacaan, update, dan delete sukses.
+   - `401 Unauthorized` jika unauthenticated atau password/email salah.
+   - `403 Forbidden` jika mengakses atau memodifikasi dompet/transaksi milik user lain.
+   - `404 Not Found` jika entitas tidak ditemukan.
+   - `422 Unprocessable Entity` jika validasi request body gagal.
+3. **Format Berkas Pengumpulan (ZIP)**:
+   - Buat folder root dengan format `XX_SERVER_MODULE` (di mana `XX` adalah nomor komputer Anda).
+   - Susun berkas sesuai fase:
+     - `XX_SERVER_MODULE_PHASE_1.zip`: Berisi folder `BACKEND/`, dump database `db-dump.sql`, dan diagram ER `db-diagram.pdf`.
+     - `XX_SERVER_MODULE_PHASE_2.zip`: Berisi folder `public/`, `src/`, dan berkas `package.json` (atau berkas HTML/JS starter).
+   - **Wajib mengecualikan** folder `vendor/` dan `node_modules/` saat membuat berkas `.zip`.
 MD,
             'duration_minutes' => 180,
             'opens_at' => now()->subDays(2),
             'closes_at' => now()->addDays(20),
             'status' => ModuleStatus::Published,
             'max_attempts_per_day' => 5,
-            'version' => 1,
+            'version' => 2,
         ]);
         $moduleA->cohorts()->attach([$cohortRpl1->id, $cohortRpl2->id, $cohortSeleksi->id]);
 
         $moduleB = Module::create([
             'slug' => 'modul-b-client-side-app',
-            'title' => 'Modul B: Client-Side Interactive Application',
+            'title' => 'Client Side Module: Interactive Indonesia Map & Route Finder',
             'track' => ModuleTrack::Client,
             'level' => 3,
-            'summary' => 'Mengembangkan antarmuka web interaktif berbasis HTML, CSS Vanilla, dan JavaScript murni dengan konsumsi REST API.',
+            'summary' => 'Mengembangkan aplikasi peta interaktif kepulauan Indonesia berbasis SVG & Vanilla JavaScript murni dengan fitur penanda lokasi, relasi transportasi, dan kalkulasi rute tercepat/termurah.',
             'brief_md' => <<<'MD'
-# Deskripsi Tugas Modul B
+# Deskripsi Tugas: Client-Side Interactive Map (Peta Transportasi Indonesia)
 
-Kembangkan antarmuka pemantauan seleksi siswa secara langsung (live board) menggunakan Vanilla JavaScript.
+Klien membutuhkan aplikasi peta interaktif visual kepulauan Indonesia yang memungkinkan pengguna menambah pinpoint lokasi, menghubungkan antar lokasi dengan moda transportasi, dan mencari rute terbaik berdasarkan durasi atau biaya.
 
-## Kebutuhan Tampilan & Interaksi
-1. Tampilan adaptif sempurna pada layar mobile (375px) dan desktop (1280px).
-2. Membaca data leaderboard dari REST API dan menampilkan daftar siswa dengan filter kelas.
-3. Fitur pencarian instan (real-time search) tanpa me-reload peramban.
-4. Modal dialog detail performa siswa saat baris tabel diklik.
+Aplikasi klien akan dinilai secara otomatis menggunakan peramban Google Chrome / Firefox Developer Edition dan pengujian otomatis **Playwright E2E**.
+
+---
+
+## 1. Fitur Utama Aplikasi
+
+1. **Memuat Peta SVG**:
+   - Peta Indonesia berbasis SVG dimuat penuh (*full size zoomed-in*) tanpa menyisakan ruang kosong.
+2. **Menambahkan Titik Lokasi (Pinpoint)**:
+   - Double-click pada peta memunculkan popup input nama lokasi. Menekan tombol Enter menyimpan lokasi.
+   - Titik lokasi ditandai dengan ikon pin merah, menampilkan nama lokasi, tombol hubungkan, dan tombol hapus.
+   - Seluruh lokasi tersimpan secara persisten (*Local Storage*) sehingga tidak hilang saat halaman di-refresh.
+3. **Menghubungkan Lokasi (Connect Locations)**:
+   - Klik ikon hubungkan, lalu klik titik tujuan.
+   - Masukkan jarak (kilometer) dan pilih moda transportasi:
+     - **Kereta Api (Train)**: Garis `#33E339`, Kecepatan 120 km/jam, Biaya Rp500/km.
+     - **Bus**: Garis `#A83BE8`, Kecepatan 80 km/jam, Biaya Rp100/km.
+     - **Pesawat (Airplane)**: Garis `#000000`, Kecepatan 800 km/jam, Biaya Rp1.000/km.
+   - Garis koneksi muncul menghubungkan kedua titik dengan keterangan jarak di tengah garis.
+4. **Pan & Zoom Peta**:
+   - Zoom-in dan zoom-out menggunakan `CTRL + Scroll` atau `CTRL + (+)` dan `CTRL + (-)`, berpusat pada posisi kursor.
+   - Panning peta (geser kiri/kanan) dengan klik tahan dan geser kursor.
+5. **Pencarian Rute (Find Route)**:
+   - Modal pencarian rute selalu berada di sisi kiri viewport peramban.
+   - Menampilkan hingga 10 rute tercepat (*fastest*) atau termurah (*cheapest*).
 MD,
             'rules_md' => <<<'MD'
-## Aturan Teknis
-- Dilarang menggunakan framework CSS seperti Tailwind/Bootstrap (gunakan CSS murni).
-- Dilarang menggunakan library JS eksternal (jQuery, React, Vue).
-- Kompres seluruh isi folder proyek (`index.html`, folder `css/`, folder `js/`) menjadi satu file `.zip`.
+## Aturan Teknis Penilaian Client-Side
+1. **Murni Tanpa Framework**:
+   - Dilarang menggunakan framework JS (React, Vue, jQuery, Leaflet, Google Maps API). Gunakan Vanilla JavaScript murni.
+   - Dilarang menggunakan framework CSS (Tailwind, Bootstrap). Gunakan CSS3 murni.
+2. **Format Pengiriman**:
+   - Buat folder root `XX_CLIENT_SIDE_MODULE` di mana `XX` adalah nomor peserta.
+   - Pastikan aplikasi berjalan normal ketika membuka berkas `index.html` secara langsung.
+   - Arsipkan ke dalam berkas `XX_CLIENT_SIDE_MODULE.zip`.
 MD,
             'duration_minutes' => 180,
             'opens_at' => now()->subDays(1),
@@ -543,19 +968,69 @@ MD,
         ]);
         $moduleB->cohorts()->attach([$cohortRpl1->id, $cohortRpl2->id, $cohortSeleksi->id]);
 
-        // Module Assets
+        // Module Assets for PintarMenabung (Modul A)
         ModuleAsset::create([
             'module_id' => $moduleA->id,
-            'label' => 'starter-pack-backend-api.zip',
-            'path' => 'assets/starter-pack-backend-api.zip',
-            'size' => 1024 * 350, // 350 KB
+            'label' => 'pintar-menabung-full-package.zip',
+            'path' => 'assets/pintar-menabung-full-package.zip',
+            'size' => 1024 * 18,
         ]);
 
+        ModuleAsset::create([
+            'module_id' => $moduleA->id,
+            'label' => 'pintar_menabung.sql',
+            'path' => 'assets/pintar_menabung.sql',
+            'size' => 1024 * 9,
+        ]);
+
+        ModuleAsset::create([
+            'module_id' => $moduleA->id,
+            'label' => 'PintarMenabung.postman_collection.json',
+            'path' => 'assets/PintarMenabung.postman_collection.json',
+            'size' => 1024 * 24,
+        ]);
+
+        ModuleAsset::create([
+            'module_id' => $moduleA->id,
+            'label' => 'PintarMenabung.postman_environment.json',
+            'path' => 'assets/PintarMenabung.postman_environment.json',
+            'size' => 350,
+        ]);
+
+        ModuleAsset::create([
+            'module_id' => $moduleA->id,
+            'label' => 'frontend-starter-kit.zip',
+            'path' => 'assets/frontend-starter-kit.zip',
+            'size' => 1024 * 12,
+        ]);
+
+        ModuleAsset::create([
+            'module_id' => $moduleA->id,
+            'label' => 'test-suite-modul-a.json',
+            'path' => 'assets/test-suite-modul-a.json',
+            'size' => 1024 * 12,
+        ]);
+
+        ModuleAsset::create([
+            'module_id' => $moduleA->id,
+            'label' => 'playwright-suite-modul-a.json',
+            'path' => 'assets/playwright-suite-modul-a.json',
+            'size' => 1024 * 4,
+        ]);
+
+        // Module Assets for Client Side (Modul B)
         ModuleAsset::create([
             'module_id' => $moduleB->id,
             'label' => 'design-mockups-assets.zip',
             'path' => 'assets/design-mockups-assets.zip',
-            'size' => 1024 * 850, // 850 KB
+            'size' => 1024 * 850,
+        ]);
+
+        ModuleAsset::create([
+            'module_id' => $moduleB->id,
+            'label' => 'playwright-suite-modul-b.json',
+            'path' => 'assets/playwright-suite-modul-b.json',
+            'size' => 1024 * 8,
         ]);
 
         // 9. Announcements
@@ -592,9 +1067,7 @@ MD,
         $rakaAttempt = $attemptBuilder->build($raka, 5);
         foreach ($rakaAttempt->items as $idx => $item) {
             $type = QuestionType::from($item->snapshot['type']);
-            // Raka gets some correct, one wrong
             if ($idx === 0) {
-                // wrong answer
                 $item->update(['answer' => ['option_id' => 9999]]);
             } elseif ($type === QuestionType::MultipleChoice || $type === QuestionType::TrueFalse) {
                 $correctOpt = collect($item->snapshot['options'])->firstWhere('is_correct', true);
@@ -606,17 +1079,31 @@ MD,
         }
         $attemptScorer->score($rakaAttempt);
 
-        // Add scored submissions for Dewi and Raka to reflect sample leaderboard in DESIGN_RULES
+        // Add scored submissions for Dewi and Raka with test results
         $dewi->submissions()->create([
             'module_id' => $moduleA->id,
             'attempt_no' => 1,
             'path' => 'submissions/modul-a/dewi.zip',
-            'original_name' => 'dewi-modul-a.zip',
+            'original_name' => 'dewi-pintar-menabung.zip',
             'size' => 1024 * 512,
-            'sha256' => hash('sha256', 'dewi-modul-a'),
+            'sha256' => hash('sha256', 'dewi-pintar-menabung'),
             'status' => SubmissionStatus::Graded,
-            'manual_score' => 95,
-            'feedback_md' => 'Arsitektur controller sangat rapi, autentikasi bekerja dengan baik. Struktur response konsisten.',
+            'manual_score' => 96,
+            'test_score' => 100,
+            'test_results' => [
+                'passed' => 17,
+                'total' => 17,
+                'percentage' => 100,
+                'status' => 'all_passed',
+                'details' => [
+                    'auth' => '5/5 Passed (20 pts)',
+                    'currency_category' => '2/2 Passed (15 pts)',
+                    'wallet' => '5/5 Passed (25 pts)',
+                    'transactions' => '3/3 Passed (25 pts)',
+                    'reports' => '2/2 Passed (15 pts)',
+                ],
+            ],
+            'feedback_md' => 'Implementasi RESTful API PintarMenabung sangat sempurna! Validasi Sanctum lengkap, kalkulasi saldo atomik, dan seluruh skenario pengujian Postman lulus 100%. Integrasi frontend dengan Chart.js dan Axios juga berjalan lancar.',
             'reviewed_by' => $mentor1->id,
             'reviewed_at' => now(),
         ]);
@@ -625,12 +1112,26 @@ MD,
             'module_id' => $moduleA->id,
             'attempt_no' => 1,
             'path' => 'submissions/modul-a/raka.zip',
-            'original_name' => 'raka-modul-a.zip',
+            'original_name' => 'raka-pintar-menabung.zip',
             'size' => 1024 * 480,
-            'sha256' => hash('sha256', 'raka-modul-a'),
+            'sha256' => hash('sha256', 'raka-pintar-menabung'),
             'status' => SubmissionStatus::Graded,
-            'manual_score' => 90,
-            'feedback_md' => 'Implementasi API bagus. Validasi input sudah lengkap.',
+            'manual_score' => 88,
+            'test_score' => 88,
+            'test_results' => [
+                'passed' => 15,
+                'total' => 17,
+                'percentage' => 88.2,
+                'status' => 'partial_passed',
+                'details' => [
+                    'auth' => '5/5 Passed (20 pts)',
+                    'currency_category' => '2/2 Passed (15 pts)',
+                    'wallet' => '4/5 Passed (20 pts)',
+                    'transactions' => '3/3 Passed (25 pts)',
+                    'reports' => '1/2 Passed (8 pts)',
+                ],
+            ],
+            'feedback_md' => 'API PintarMenabung berjalan baik. Perhatikan pengecekan kepemilikan wallet saat update (C2) yang masih menghasilkan 404 bukan 403 saat diakses pengguna lain, serta filter bulan pada summary income.',
             'reviewed_by' => $mentor1->id,
             'reviewed_at' => now(),
         ]);

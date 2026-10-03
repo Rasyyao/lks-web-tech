@@ -1,0 +1,436 @@
+{
+  "suite_name": "PintarMenabung - LKS Server Side RESTful API Test Suite",
+  "version": "2.0.0",
+  "base_url": "http://127.0.0.1:8000/api",
+  "postman_collection": "PintarMenabung.postman_collection.json",
+  "total_points": 100,
+  "rubric": {
+    "auth_points": 20,
+    "currency_category_points": 15,
+    "wallet_points": 25,
+    "transaction_points": 25,
+    "report_points": 15
+  },
+  "test_cases": [
+    {
+      "id": "TC-A1-REG-SUCCESS",
+      "group": "A. Otentikasi (Sanctum)",
+      "title": "A1a: Registrasi pengguna baru berhasil",
+      "method": "POST",
+      "endpoint": "/api/auth/register",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "full_name": "Dedi Pratama",
+        "email": "dedi@webtech.id",
+        "password": "password123"
+      },
+      "expected_status": 201,
+      "expected_response": {
+        "status": "success",
+        "message": "Registration successful",
+        "data": {
+          "id": "NUMBER",
+          "name": "Dedi Pratama",
+          "email": "dedi@webtech.id",
+          "token": "STRING_SANCTUM_TOKEN"
+        }
+      },
+      "points": 5
+    },
+    {
+      "id": "TC-A1-REG-VALIDATION",
+      "group": "A. Otentikasi (Sanctum)",
+      "title": "A1b: Registrasi gagal jika data tidak valid (Validation 422)",
+      "method": "POST",
+      "endpoint": "/api/auth/register",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "full_name": "",
+        "email": "invalid-email",
+        "password": "123"
+      },
+      "expected_status": 422,
+      "expected_response": {
+        "status": "error",
+        "message": "Invalid field",
+        "errors": {
+          "name": ["STRING"],
+          "email": ["STRING"],
+          "password": ["STRING"]
+        }
+      },
+      "points": 5
+    },
+    {
+      "id": "TC-A2-LOGIN-SUCCESS",
+      "group": "A. Otentikasi (Sanctum)",
+      "title": "A2a: Login dengan email & password valid",
+      "method": "POST",
+      "endpoint": "/api/auth/login",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "email": "budi@webtech.id",
+        "password": "password123"
+      },
+      "expected_status": 200,
+      "expected_response": {
+        "status": "success",
+        "message": "Login successful",
+        "data": {
+          "id": "NUMBER",
+          "name": "Budi",
+          "email": "budi@webtech.id",
+          "token": "STRING_SANCTUM_TOKEN"
+        }
+      },
+      "points": 5
+    },
+    {
+      "id": "TC-A2-LOGIN-FAILED",
+      "group": "A. Otentikasi (Sanctum)",
+      "title": "A2b: Login gagal dengan password salah (401)",
+      "method": "POST",
+      "endpoint": "/api/auth/login",
+      "headers": {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "email": "budi@webtech.id",
+        "password": "wrongpassword"
+      },
+      "expected_status": 401,
+      "expected_response": {
+        "status": "error",
+        "message": "Username or password incorrect"
+      },
+      "points": 3
+    },
+    {
+      "id": "TC-A3-LOGOUT",
+      "group": "A. Otentikasi (Sanctum)",
+      "title": "A3: Logout menonaktifkan token perangkat aktif",
+      "method": "POST",
+      "endpoint": "/api/auth/logout",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}"
+      },
+      "expected_status": 200,
+      "expected_response": {
+        "status": "success",
+        "message": "Logout successful"
+      },
+      "points": 2
+    },
+    {
+      "id": "TC-B1-CURRENCIES",
+      "group": "B. Mata Uang & Kategori",
+      "title": "B1: Mendapatkan daftar seluruh mata uang (USD, IDR, dll)",
+      "method": "GET",
+      "endpoint": "/api/currencies",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}"
+      },
+      "expected_status": 200,
+      "expected_response": {
+        "message": "Get all currencies successful",
+        "data": {
+          "currencies": [
+            {
+              "id": "NUMBER",
+              "name": "STRING",
+              "symbol": "STRING",
+              "code": "STRING"
+            }
+          ]
+        }
+      },
+      "points": 7
+    },
+    {
+      "id": "TC-B2-CATEGORIES",
+      "group": "B. Mata Uang & Kategori",
+      "title": "B2: Mendapatkan daftar kategori transaksi (EXPENSE & INCOME)",
+      "method": "GET",
+      "endpoint": "/api/categories",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}"
+      },
+      "expected_status": 200,
+      "expected_response": {
+        "status": "success",
+        "message": "Get all categories successful",
+        "data": {
+          "categories": [
+            {
+              "id": "NUMBER",
+              "name": "STRING",
+              "icon": "STRING",
+              "type": "EXPENSE|INCOME"
+            }
+          ]
+        }
+      },
+      "points": 8
+    },
+    {
+      "id": "TC-C1-ADD-WALLET",
+      "group": "C. Pengelolaan Wallet",
+      "title": "C1: Menambahkan dompet baru untuk user aktif",
+      "method": "POST",
+      "endpoint": "/api/wallets",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "name": "Tabungan Masa Depan",
+        "currency_code": "IDR"
+      },
+      "expected_status": 201,
+      "expected_response": {
+        "status": "success",
+        "message": "Wallet added successful",
+        "data": {
+          "id": "NUMBER",
+          "name": "Tabungan Masa Depan",
+          "user_id": "NUMBER",
+          "currency_code": "IDR"
+        }
+      },
+      "points": 5
+    },
+    {
+      "id": "TC-C2-UPDATE-WALLET",
+      "group": "C. Pengelolaan Wallet",
+      "title": "C2: Mengubah nama dompet milik sendiri",
+      "method": "PUT",
+      "endpoint": "/api/wallets/1",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "name": "Cash IDR Updated"
+      },
+      "expected_status": 200,
+      "expected_response": {
+        "status": "success",
+        "message": "Wallet updated successful",
+        "data": {
+          "id": 1,
+          "name": "Cash IDR Updated"
+        }
+      },
+      "points": 5
+    },
+    {
+      "id": "TC-C4-GET-WALLETS",
+      "group": "C. Pengelolaan Wallet",
+      "title": "C4: Mengambil seluruh dompet beserta kalkulasi balance",
+      "method": "GET",
+      "endpoint": "/api/wallets",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}"
+      },
+      "expected_status": 200,
+      "expected_response": {
+        "status": "success",
+        "message": "Get all wallets successful",
+        "data": {
+          "wallets": [
+            {
+              "id": "NUMBER",
+              "user_id": "NUMBER",
+              "name": "STRING",
+              "currency_code": "STRING",
+              "balance": "NUMBER_DYNAMIC_SUM"
+            }
+          ]
+        }
+      },
+      "points": 10
+    },
+    {
+      "id": "TC-C5-WALLET-DETAIL",
+      "group": "C. Pengelolaan Wallet",
+      "title": "C5: Mengambil rincian dompet spesifik dengan saldo terkini",
+      "method": "GET",
+      "endpoint": "/api/wallets/1",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}"
+      },
+      "expected_status": 200,
+      "expected_response": {
+        "status": "success",
+        "message": "Get detail wallet successful",
+        "data": {
+          "id": 1,
+          "name": "STRING",
+          "balance": "NUMBER"
+        }
+      },
+      "points": 5
+    },
+    {
+      "id": "TC-D1-ADD-TRANSACTION",
+      "group": "D. Transaksi Keuangan",
+      "title": "D1: Mencatat transaksi baru (memperbarui saldo dompet)",
+      "method": "POST",
+      "endpoint": "/api/transactions",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}",
+        "Content-Type": "application/json"
+      },
+      "request_body": {
+        "wallet_id": 1,
+        "category_id": 3,
+        "amount": 50000,
+        "date": "2025-07-31",
+        "note": "Kopi dan Makan Siang"
+      },
+      "expected_status": 201,
+      "expected_response": {
+        "status": "success",
+        "message": "Transaction added successful",
+        "data": {
+          "id": "NUMBER",
+          "wallet_id": 1,
+          "category_id": 3,
+          "amount": 50000,
+          "date": "2025-07-31"
+        }
+      },
+      "points": 10
+    },
+    {
+      "id": "TC-D2-DELETE-TRANSACTION",
+      "group": "D. Transaksi Keuangan",
+      "title": "D2: Menghapus transaksi (mengembalikan saldo dompet)",
+      "method": "DELETE",
+      "endpoint": "/api/transactions/1",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}"
+      },
+      "expected_status": 200,
+      "expected_response": {
+        "status": "success",
+        "message": "Transaction deleted successful"
+      },
+      "points": 5
+    },
+    {
+      "id": "TC-D3-GET-TRANSACTIONS",
+      "group": "D. Transaksi Keuangan",
+      "title": "D3: Mengambil riwayat transaksi terpaginasi & terurut descending",
+      "method": "GET",
+      "endpoint": "/api/transactions?page=1&per_page=25&month=7&year=2025",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}"
+      },
+      "expected_status": 200,
+      "expected_response": {
+        "current_page": 1,
+        "data": [
+          {
+            "id": "NUMBER",
+            "amount": "NUMBER",
+            "date": "STRING",
+            "wallet": {
+              "id": "NUMBER",
+              "name": "STRING"
+            },
+            "category": {
+              "id": "NUMBER",
+              "name": "STRING",
+              "type": "STRING"
+            }
+          }
+        ],
+        "total": "NUMBER"
+      },
+      "points": 10
+    },
+    {
+      "id": "TC-E1-REPORT-EXPENSE",
+      "group": "E. Laporan Finansial",
+      "title": "E1: Ringkasan pengeluaran per kategori per bulan (Expense Report)",
+      "method": "GET",
+      "endpoint": "/api/reports/summary-by-category/expense?month=7&year=2025",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}"
+      },
+      "expected_status": 200,
+      "expected_response": {
+        "status": "success",
+        "message": "Get summary by expense category successful",
+        "data": {
+          "summary": [
+            {
+              "category": {
+                "id": "NUMBER",
+                "name": "STRING",
+                "icon": "STRING",
+                "color": "STRING",
+                "type": "EXPENSE"
+              },
+              "amount": "NUMBER"
+            }
+          ]
+        }
+      },
+      "points": 8
+    },
+    {
+      "id": "TC-E2-REPORT-INCOME",
+      "group": "E. Laporan Finansial",
+      "title": "E2: Ringkasan pemasukan per kategori per bulan (Income Report)",
+      "method": "GET",
+      "endpoint": "/api/reports/summary-by-category/income?month=7&year=2025",
+      "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer {{AUTH_TOKEN}}"
+      },
+      "expected_status": 200,
+      "expected_response": {
+        "status": "success",
+        "message": "Get summary by income category successful",
+        "data": {
+          "summary": [
+            {
+              "category": {
+                "id": "NUMBER",
+                "name": "STRING",
+                "icon": "STRING",
+                "color": "STRING",
+                "type": "INCOME"
+              },
+              "amount": "NUMBER"
+            }
+          ]
+        }
+      },
+      "points": 7
+    }
+  ]
+}

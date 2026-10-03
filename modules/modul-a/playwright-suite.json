@@ -1,0 +1,95 @@
+{
+  "suite_name": "PintarMenabung - Phase 2 Frontend Playwright E2E Test Suite",
+  "version": "1.0.0",
+  "framework": "Playwright",
+  "target_url": "http://127.0.0.1:3000",
+  "total_scenarios": 8,
+  "scenarios": [
+    {
+      "id": "PW-A-FE-01",
+      "feature": "Document Title",
+      "description": "Judul dokumen di browser harus merefleksikan nama halaman aktif secara dinamis",
+      "steps": [
+        "Navigasi ke /login -> expect(page).toHaveTitle(/Login/i)",
+        "Navigasi ke /register -> expect(page).toHaveTitle(/Register/i)",
+        "Login berhasil dan masuk ke / -> expect(page).toHaveTitle(/Overview/i)",
+        "Buka detail wallet -> expect(page).toHaveTitle(/Wallet Detail/i)"
+      ],
+      "points": 10
+    },
+    {
+      "id": "PW-A-FE-02",
+      "feature": "Auth Guard & Redirect",
+      "description": "Halaman Overview dan Wallet Detail terproteksi; user belum login diredirect ke login",
+      "steps": [
+        "Hapus localStorage token dan buka / -> harus dialihkan ke login.html",
+        "Set token valid dan buka login.html -> harus dialihkan otomatis ke index.html",
+        "Klik tombol Logout di navbar -> token dihapus dan dialihkan ke login.html"
+      ],
+      "points": 15
+    },
+    {
+      "id": "PW-A-FE-03",
+      "feature": "Wallet Cards & Formatted Balance",
+      "description": "Menampilkan seluruh dompet pengguna dengan format mata uang yang benar (misal: IDR 5,190,000)",
+      "steps": [
+        "Cek kontainer #wallet-list memuat kartu dompet",
+        "Verifikasi teks saldo memiliki format mata uang sesuai spesifikasi (IDR / USD)"
+      ],
+      "points": 15
+    },
+    {
+      "id": "PW-A-FE-04",
+      "feature": "Date-Grouped Transactions",
+      "description": "Transaksi dikelompokkan per tanggal ramah pengguna (misal: Jul 31, 2025) dan tanggal hanya muncul sekali per grup",
+      "steps": [
+        "Cek daftar transaksi #transaction-list",
+        "Pastikan header tanggal hanya muncul 1 kali untuk transaksi di tanggal yang sama"
+      ],
+      "points": 15
+    },
+    {
+      "id": "PW-A-FE-05",
+      "feature": "Color & Sign Badges",
+      "description": "Pengeluaran berwarna merah dengan tanda minus (-), pemasukan berwarna hijau dengan tanda plus (+)",
+      "steps": [
+        "Transaksi tipe EXPENSE memiliki kelas .tx-expense atau warna merah dan prefiks '-'",
+        "Transaksi tipe INCOME memiliki kelas .tx-income atau warna hijau dan prefiks '+'"
+      ],
+      "points": 10
+    },
+    {
+      "id": "PW-A-FE-06",
+      "feature": "Keyboard Shortcuts",
+      "description": "Pintasan keyboard Alt+W, Alt+N, Alt+T membuka form modal dan Esc menutup modal",
+      "steps": [
+        "Tekan tombol Alt+W -> Modal #modal-add-wallet harus terlihat (visible)",
+        "Tekan tombol Escape -> Modal harus tertutup (hidden)",
+        "Tekan tombol Alt+N -> Modal #modal-add-transaction harus terlihat",
+        "Tekan tombol Alt+T -> Modal transfer harus terlihat"
+      ],
+      "points": 15
+    },
+    {
+      "id": "PW-A-FE-07",
+      "feature": "Chart.js Doughnut Chart",
+      "description": "Halaman detail dompet menampilkan diagram donat pengeluaran & pemasukan dengan label di bagian bawah",
+      "steps": [
+        "Buka /wallets/:id",
+        "Elemen canvas chart harus ter-render dengan Chart.js instance",
+        "Legend label kategori terlihat di bagian bawah diagram"
+      ],
+      "points": 10
+    },
+    {
+      "id": "PW-A-FE-08",
+      "feature": "Inline Rename & Delete Wallet",
+      "description": "Rename dompet inline dengan Enter, serta hapus dompet dengan mengosongkan nama + Enter + konfirmasi",
+      "steps": [
+        "Klik nama dompet, edit teks, tekan Enter -> API update terpanggil dan nama terbarukan",
+        "Kosongkan nama dompet, tekan Enter -> Dialog konfirmasi muncul"
+      ],
+      "points": 10
+    }
+  ]
+}

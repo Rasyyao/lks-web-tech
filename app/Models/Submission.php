@@ -18,6 +18,8 @@ class Submission extends Model
         'sha256',
         'status',
         'manual_score',
+        'test_score',
+        'test_results',
         'feedback_md',
         'reviewed_by',
         'reviewed_at',
@@ -29,6 +31,8 @@ class Submission extends Model
             'status' => SubmissionStatus::class,
             'size' => 'integer',
             'manual_score' => 'integer',
+            'test_score' => 'integer',
+            'test_results' => 'array',
             'attempt_no' => 'integer',
             'reviewed_at' => 'datetime',
         ];

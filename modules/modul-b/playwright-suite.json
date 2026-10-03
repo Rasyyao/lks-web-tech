@@ -1,0 +1,74 @@
+{
+  "suite_name": "LKS Web Tech - Modul B Client-Side Playwright E2E Test Suite",
+  "version": "1.0.0",
+  "target": "Vanilla HTML5, CSS3, & Vanilla JavaScript",
+  "total_points": 100,
+  "test_scenarios": [
+    {
+      "id": "E2E-UI-01",
+      "category": "Render Awal & Kepatuhan Layout",
+      "description": "Halaman awal memuat header, bilah pencarian, filter kategori, dan tabel data dalam waktu < 1.5s",
+      "viewport": { "width": 1280, "height": 800 },
+      "assertions": [
+        "page.locator('header').isVisible() === true",
+        "page.locator('input[type=search], input#search').isVisible() === true",
+        "page.locator('table, [role=table]').isVisible() === true",
+        "page.locator('tbody tr').count() > 0"
+      ],
+      "points": 20
+    },
+    {
+      "id": "E2E-UI-02",
+      "category": "Interaktivitas & Pencarian Real-Time",
+      "description": "Mengetik nama barang memfilter baris tabel secara instan tanpa melakukan refresh atau reload peramban",
+      "actions": [
+        "page.fill('#search', 'ThinkPad')",
+        "page.waitForTimeout(300)"
+      ],
+      "assertions": [
+        "Semua baris yang terlihat mengandung teks 'ThinkPad'",
+        "Navigasi URL peramban tidak berubah (tidak terjadi reload halaman)"
+      ],
+      "points": 25
+    },
+    {
+      "id": "E2E-UI-03",
+      "category": "Filter Kategori",
+      "description": "Memilih kategori dari dropdown memperbarui isi tabel hanya dengan data kategori yang dipilih",
+      "actions": [
+        "page.selectOption('#category-select', 'Elektronik')",
+        "page.waitForTimeout(200)"
+      ],
+      "assertions": [
+        "Semua baris tabel memiliki kolom kategori bernilai 'Elektronik'"
+      ],
+      "points": 20
+    },
+    {
+      "id": "E2E-UI-04",
+      "category": "Modal Dialog Detail & Aksesibilitas",
+      "description": "Mengklik baris data membuka modal detail informasi lengkap barang, dan tombol Escape dapat menutup modal",
+      "actions": [
+        "page.click('tbody tr:first-child')",
+        "page.waitForSelector('.modal, dialog[open]')",
+        "page.keyboard.press('Escape')"
+      ],
+      "assertions": [
+        "Modal terlihat setelah baris diklik",
+        "Modal tertutup setelah menekan tombol Escape"
+      ],
+      "points": 20
+    },
+    {
+      "id": "E2E-UI-05",
+      "category": "Responsivitas Mobile (375px)",
+      "description": "Pada viewport layar 375x667 tidak terjadi horizontal scrollbar (scrollWidth === clientWidth) dan menu navigasi mobile berfungsi",
+      "viewport": { "width": 375, "height": 667 },
+      "assertions": [
+        "document.documentElement.scrollWidth <= 375",
+        "Konten terbaca dengan baik tanpa elemen terpotong"
+      ],
+      "points": 15
+    }
+  ]
+}
