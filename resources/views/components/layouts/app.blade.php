@@ -10,7 +10,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="min-h-screen bg-paper text-ink font-sans antialiased">
+<body class="min-h-screen bg-paper text-ink font-sans antialiased flex flex-col">
     {{-- Header --}}
     <header class="bg-sheet border-b-[3px] border-brand">
         <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14 sm:h-16">
@@ -103,12 +103,12 @@
     @endif
 
     {{-- Main content --}}
-    <main class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <main class="flex-1 w-full mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {{ $slot }}
     </main>
 
     {{-- Footer --}}
-    <footer class="border-t border-rule mt-auto">
+    <footer class="border-t border-rule mt-auto bg-sheet">
         <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6 text-sm text-ink-muted">
             {{ __('general.school_name') }} — {{ __('general.site_name') }}
         </div>

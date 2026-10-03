@@ -81,7 +81,7 @@
         </div>
     </main>
 
-    <footer class="border-t border-rule">
+    <footer class="border-t border-rule mt-auto bg-sheet">
         <div class="mx-auto max-w-7xl xl:max-w-[1400px] px-4 sm:px-6 lg:px-8 py-6 text-sm text-ink-muted">
             SMK Telkom Purwokerto — LKS Web Technology
         </div>
