@@ -19,37 +19,27 @@ class ModuleShow extends Component
     public Module $module;
     public $zipFile;
     public ?array $testSuite = null;
-    public ?array $playwrightSuite = null;
 
     public function mount(Module $module): void
     {
         $this->module = $module->load(['assets', 'cohorts']);
 
-        // Load automated API test suite JSON if available
+        // Load automated API test suite JSON if available (Postman format)
         $suitePath = match ($module->slug) {
             'modul-a-server-side-api' => base_path('modules/modul-a/test-suite.json'),
-            'modul-b-client-side-app' => base_path('modules/modul-b/playwright-suite.json'),
             default => null,
         };
 
         if ($suitePath && file_exists($suitePath)) {
             $this->testSuite = json_decode(file_get_contents($suitePath), true);
         }
-
-        // Load frontend Playwright test suite if available
-        $pwPath = match ($module->slug) {
-            'modul-a-server-side-api' => base_path('modules/modul-a/playwright-suite.json'),
-            'modul-b-client-side-app' => base_path('modules/modul-b/playwright-suite.json'),
-            default => null,
-        };
-
-        if ($pwPath && file_exists($pwPath)) {
-            $this->playwrightSuite = json_decode(file_get_contents($pwPath), true);
-        }
     }
 
-    public function submitZip(ZipUploadValidator $validator, SubmissionStorage $storage): void
-    {
+    public function submitZip(
+        ZipUploadValidator $validator,
+        SubmissionStorage $storage,
+        \App\Services\Submissions\AutomatedJudgeService $judge
+    ): void {
         $user = Auth::user();
 
         $this->validate([
@@ -66,7 +56,10 @@ class ModuleShow extends Component
             return;
         }
 
-        $storage->store($this->zipFile, $this->module, $user);
+        $submission = $storage->store($this->zipFile, $this->module, $user);
+
+        // Run internal automated evaluation in background (invisible to students)
+        $judge->evaluate($submission);
 
         $this->reset('zipFile');
         session()->flash('success', __('modules.submitted_success'));
@@ -91,7 +84,6 @@ class ModuleShow extends Component
             'remainingAttempts' => $remainingAttempts,
             'isOpen' => $this->module->isOpen(),
             'testSuite' => $this->testSuite,
-            'playwrightSuite' => $this->playwrightSuite,
         ])->title($this->module->title);
     }
 }

@@ -1,6 +1,6 @@
 {{-- DESIGN PLAN RECORD --}}
 {{-- Screen: Module Detail Widescreen (/modul/{slug}) --}}
-{{-- Primary job of the screen: Provide comprehensive LKS task brief (Backend REST API & Frontend Web App), database schema & ERD, automated Postman/Playwright test suites, downloadable starter pack assets, and quick sidebar ZIP submission. --}}
+{{-- Primary job of the screen: Provide comprehensive LKS task brief (Backend REST API & Frontend Web App), database schema & ERD, API specification criteria, downloadable starter pack assets, and quick sidebar ZIP submission. --}}
 {{-- Palette used: sheet, rule, ink, ink-muted, brand, brand-deep, pass, paper, tint, gold --}}
 {{-- Type roles: Schibsted Grotesk for prose & headers; tabular-nums for scores and limits; JetBrains Mono for endpoints, code, JSON payloads, and headers --}}
 {{-- Layout idea: High-productivity two-column workspace on desktop (8-col documentation & API tabs on left, 4-col sticky status, assets, submit form, and test results on right) utilizing 1400px widescreen space. --}}
@@ -83,28 +83,13 @@
                         class="px-3 sm:px-4 py-2 rounded-t-cell transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep flex items-center gap-1.5"
                         role="tab"
                     >
-                        <span>API Postman</span>
+                        <span>Kriteria Pengujian API</span>
                         @if($testSuite && isset($testSuite['test_cases']))
                             <span class="text-[10px] px-1.5 py-0.2 rounded-cell bg-paper text-ink font-mono font-medium border border-rule">
-                                {{ count($testSuite['test_cases']) }} Tes
+                                {{ count($testSuite['test_cases']) }} Kasus
                             </span>
                         @endif
                     </button>
-
-                    @if($playwrightSuite)
-                        <button
-                            type="button"
-                            x-on:click="activeTab = 'playwright'"
-                            :class="activeTab === 'playwright' ? 'border-brand text-brand-deep font-bold border-b-2 bg-tint/40' : 'border-transparent text-ink-muted hover:text-ink hover:border-rule'"
-                            class="px-3 sm:px-4 py-2 rounded-t-cell transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep flex items-center gap-1.5"
-                            role="tab"
-                        >
-                            <span>E2E Playwright</span>
-                            <span class="text-[10px] px-1.5 py-0.2 rounded-cell bg-paper text-ink font-mono font-medium border border-rule">
-                                {{ count($playwrightSuite['scenarios'] ?? $playwrightSuite['test_scenarios'] ?? []) }} Skenario
-                            </span>
-                        </button>
-                    @endif
 
                     <button
                         type="button"
@@ -113,7 +98,7 @@
                         class="px-3 sm:px-4 py-2 rounded-t-cell transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
                         role="tab"
                     >
-                        Aturan & ZIP
+                        Aturan & Format ZIP
                     </button>
                 </div>
             </x-panel>
@@ -363,63 +348,7 @@
                 </x-panel>
             </div>
 
-            {{-- TAB 4: PLAYWRIGHT E2E FRONTEND TEST SUITE --}}
-            @if($playwrightSuite)
-                <div x-show="activeTab === 'playwright'" class="space-y-6" style="display: none;">
-                    <x-panel class="space-y-4">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div>
-                                <h2 class="text-xl font-bold text-ink">
-                                    Matriks Pengujian Playwright E2E (Frontend Web App)
-                                </h2>
-                                <p class="text-xs text-ink-muted">
-                                    Skenario pengujian interaktivitas peramban otomatis (Playwright) untuk memvalidasi UI, routing, auth guard, dan shortcut keyboard.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="overflow-x-auto border border-rule rounded-panel">
-                            <table class="w-full text-left text-xs text-ink">
-                                <thead class="bg-paper border-b border-rule">
-                                    <tr>
-                                        <th scope="col" class="py-2.5 px-3 font-semibold text-ink-muted w-28">ID Skenario</th>
-                                        <th scope="col" class="py-2.5 px-3 font-semibold text-ink-muted w-36">Fitur</th>
-                                        <th scope="col" class="py-2.5 px-3 font-semibold text-ink-muted">Deskripsi & Langkah Pengujian</th>
-                                        <th scope="col" class="py-2.5 px-3 font-semibold text-ink-muted text-right w-16">Bobot</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-rule">
-                                    @foreach($playwrightSuite['scenarios'] ?? $playwrightSuite['test_scenarios'] ?? [] as $sc)
-                                        <tr class="hover:bg-paper/50">
-                                            <td class="py-2.5 px-3 font-mono font-bold text-ink-muted">
-                                                {{ $sc['id'] }}
-                                            </td>
-                                            <td class="py-2.5 px-3 font-semibold text-brand-deep">
-                                                {{ $sc['feature'] ?? $sc['category'] ?? '-' }}
-                                            </td>
-                                            <td class="py-2.5 px-3 space-y-1">
-                                                <p class="text-ink font-medium">{{ $sc['description'] }}</p>
-                                                @if(!empty($sc['steps']))
-                                                    <div class="text-[11px] font-mono text-ink-muted space-y-0.5 pt-1">
-                                                        @foreach($sc['steps'] as $step)
-                                                            <div>&bull; {{ $step }}</div>
-                                                        @endforeach
-                                                    </div>
-                                                @endif
-                                            </td>
-                                            <td class="py-2.5 px-3 text-right font-bold text-ink tabular-nums">
-                                                {{ $sc['points'] }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </x-panel>
-                </div>
-            @endif
-
-            {{-- TAB 5: RULES & ATURAN PENILAIAN --}}
+            {{-- TAB 4: RULES & ATURAN PENILAIAN --}}
             <div x-show="activeTab === 'rules'" class="space-y-6" style="display: none;">
                 <x-panel class="space-y-4">
                     <h2 class="text-xl font-bold text-ink">
@@ -531,6 +460,10 @@
 
             {{-- Panel 3: Paket Aset & Starter Kit (Downloadable Assets) --}}
             <x-panel class="space-y-3">
+                @php
+                    $visibleAssets = $module->assets->reject(fn($a) => str_contains(strtolower($a->label), 'playwright') || str_contains(strtolower($a->label), 'test-suite'));
+                @endphp
+
                 <div class="flex items-center justify-between border-b border-rule pb-2">
                     <div>
                         <h3 class="text-sm font-bold text-ink">
@@ -539,17 +472,17 @@
                         <p class="text-[11px] text-ink-muted">Berkas resmi untuk peserta</p>
                     </div>
                     <span class="text-[11px] font-mono font-medium text-brand-deep px-1.5 py-0.5 rounded-cell bg-tint border border-brand-deep/10">
-                        {{ $module->assets->count() }} Berkas
+                        {{ $visibleAssets->count() }} Berkas
                     </span>
                 </div>
 
-                @if($module->assets->isEmpty())
+                @if($visibleAssets->isEmpty())
                     <p class="text-xs text-ink-muted py-2 text-center">
                         Tidak ada berkas starter pack untuk modul ini.
                     </p>
                 @else
                     <ul class="divide-y divide-rule" role="list">
-                        @foreach($module->assets as $asset)
+                        @foreach($visibleAssets as $asset)
                             @php
                                 $isFullPack = str_contains($asset->label, 'full-package');
                                 $isSql = str_contains($asset->label, '.sql');
@@ -638,10 +571,11 @@
                                         @php
                                             $passed = $sub->test_results['passed'] ?? 0;
                                             $total = $sub->test_results['total'] ?? 0;
+                                            $scoreVal = $sub->test_score ?? ($total > 0 ? round(($passed / $total) * 100) : 0);
                                             $ratioClass = ($passed === $total && $total > 0) ? 'text-pass font-bold' : 'text-gold-text font-semibold';
                                         @endphp
-                                        <div class="text-[11px] font-mono {{ $ratioClass }}" title="Automated Test Suite Result">
-                                            Tes: {{ $passed }}/{{ $total }} Lulus
+                                        <div class="text-[11px] font-mono {{ $ratioClass }}" title="Hasil Evaluasi Sistem">
+                                            Uji Sistem: {{ $scoreVal }}/100 ({{ $passed }}/{{ $total }} Lulus)
                                         </div>
                                     @endif
                                 </div>
@@ -649,7 +583,7 @@
                                 {{-- Test results breakdown if available --}}
                                 @if(isset($sub->test_results['details']))
                                     <div class="bg-sheet p-2 rounded-cell border border-rule text-[10px] font-mono space-y-1 text-ink-muted">
-                                        <span class="font-bold text-ink block uppercase tracking-wider">Hasil Pengujian Otomatis:</span>
+                                        <span class="font-bold text-ink block uppercase tracking-wider">Hasil Pengujian Sistem:</span>
                                         @foreach($sub->test_results['details'] as $cat => $val)
                                             <div class="flex justify-between">
                                                 <span class="capitalize">{{ str_replace('_', ' ', $cat) }}:</span>

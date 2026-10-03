@@ -27,6 +27,21 @@ class SubmissionReview extends Component
         $this->status = $submission->status->value;
     }
 
+    public function rerunJudge(): void
+    {
+        $judge = app(\App\Services\Submissions\AutomatedJudgeService::class);
+        $results = $judge->evaluate($this->submission);
+        $this->submission->refresh();
+        session()->flash('success', 'Evaluasi otomatis sistem (Playwright E2E & Postman API) berhasil dijalankan ulang. Skor: ' . ($results['score'] ?? 0) . '/100');
+    }
+
+    public function applyTestScore(): void
+    {
+        if ($this->submission->test_score !== null) {
+            $this->manual_score = $this->submission->test_score;
+        }
+    }
+
     public function saveReview(): void
     {
         $mentor = Auth::user();

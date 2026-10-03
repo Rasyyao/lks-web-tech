@@ -478,7 +478,7 @@ MD,
             'title' => 'Server Side Module: PintarMenabung (REST API & Frontend Integration)',
             'track' => ModuleTrack::Server,
             'level' => 3,
-            'summary' => 'Membangun sistem backend REST API berbasis Laravel Sanctum (Phase 1) dan aplikasi frontend terintegrasi berbasis Vue/React/Bootstrap 5 & Axios (Phase 2) dengan pengujian otomatis Postman dan Playwright.',
+            'summary' => 'Membangun sistem backend REST API berbasis Laravel Sanctum (Phase 1) dan aplikasi frontend terintegrasi berbasis Vue/React/Bootstrap 5 & Axios (Phase 2) dengan pengujian otomatis sistem evaluasi juri.',
             'brief_md' => <<<'MD'
 # Deskripsi Tugas: PintarMenabung (Financial Management Application)
 
@@ -923,7 +923,7 @@ MD,
 
 Klien membutuhkan aplikasi peta interaktif visual kepulauan Indonesia yang memungkinkan pengguna menambah pinpoint lokasi, menghubungkan antar lokasi dengan moda transportasi, dan mencari rute terbaik berdasarkan durasi atau biaya.
 
-Aplikasi klien akan dinilai secara otomatis menggunakan peramban Google Chrome / Firefox Developer Edition dan pengujian otomatis **Playwright E2E**.
+Aplikasi klien akan dinilai secara otomatis oleh sistem evaluasi juri berbasis integrasi peramban dan kriteria fungsional interaktif.
 
 ---
 
@@ -1004,33 +1004,12 @@ MD,
             'size' => 1024 * 12,
         ]);
 
-        ModuleAsset::create([
-            'module_id' => $moduleA->id,
-            'label' => 'test-suite-modul-a.json',
-            'path' => 'assets/test-suite-modul-a.json',
-            'size' => 1024 * 12,
-        ]);
-
-        ModuleAsset::create([
-            'module_id' => $moduleA->id,
-            'label' => 'playwright-suite-modul-a.json',
-            'path' => 'assets/playwright-suite-modul-a.json',
-            'size' => 1024 * 4,
-        ]);
-
         // Module Assets for Client Side (Modul B)
         ModuleAsset::create([
             'module_id' => $moduleB->id,
             'label' => 'design-mockups-assets.zip',
             'path' => 'assets/design-mockups-assets.zip',
             'size' => 1024 * 850,
-        ]);
-
-        ModuleAsset::create([
-            'module_id' => $moduleB->id,
-            'label' => 'playwright-suite-modul-b.json',
-            'path' => 'assets/playwright-suite-modul-b.json',
-            'size' => 1024 * 8,
         ]);
 
         // 9. Announcements
@@ -1144,6 +1123,34 @@ MD,
             'size' => 1024 * 610,
             'sha256' => hash('sha256', 'dimas-modul-a'),
             'status' => SubmissionStatus::Received, // Pending review in mentor inbox
+            'test_score' => 92,
+            'test_results' => [
+                'score' => 92,
+                'passed' => 23,
+                'total' => 25,
+                'percentage' => 92.0,
+                'status' => 'partial_passed',
+                'executed_at' => now()->toIso8601String(),
+                'runner' => 'System Automated Judge (API & Headless E2E)',
+                'details' => [
+                    'auth' => '5/5 Passed (20 pts)',
+                    'currency_category' => '2/2 Passed (15 pts)',
+                    'wallet' => '5/5 Passed (25 pts)',
+                    'transactions' => '3/3 Passed (25 pts)',
+                    'reports' => '2/2 Passed (15 pts)',
+                    'frontend_integration' => '6/8 Skenario Lulus',
+                ],
+                'admin_logs' => [
+                    'zip_entries_analyzed' => 42,
+                    'backend_detected' => true,
+                    'frontend_detected' => true,
+                    'sql_dump_detected' => true,
+                    'playwright_headless_exit_code' => 0,
+                    'playwright_scenarios_passed' => 6,
+                    'playwright_scenarios_total' => 8,
+                    'playwright_suite_path' => 'modules/modul-a/playwright-suite.json',
+                ],
+            ],
         ]);
 
         // Recompute leaderboard for seeded students
