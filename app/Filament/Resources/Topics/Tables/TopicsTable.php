@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Topics\Tables;
 
+use App\Filament\Actions\AuditedDeleteAction;
+use App\Models\Topic;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -35,6 +37,10 @@ class TopicsTable
             ->reorderable('position')
             ->recordActions([
                 EditAction::make(),
+                // Deleting a topic cascades to its questions and attempt history.
+                AuditedDeleteAction::make()
+                    ->hidden(fn (Topic $record): bool => $record->questions()->exists())
+                    ->modalDescription('Materi dalam topik ini ikut terhapus.'),
             ]);
     }
 }

@@ -34,12 +34,4 @@ class EditQuestionBankPaper extends EditRecord
     {
         $this->audit('updated');
     }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            $this->auditedDeleteAction()
-                ->after(fn (QuestionBankPaper $record) => Storage::disk('private')->delete($record->file_path)),
-        ];
-    }
 }

@@ -3,7 +3,6 @@
 namespace App\Filament\Concerns;
 
 use App\Models\AuditLog;
-use Filament\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -32,17 +31,5 @@ trait RecordsAuditTrail
             $record,
             array_filter(['changed' => $changed] + $extra),
         );
-    }
-
-    /**
-     * A DeleteAction that records who deleted the record.
-     */
-    protected function auditedDeleteAction(): DeleteAction
-    {
-        return DeleteAction::make()
-            ->after(fn (Model $record) => AuditLog::record(
-                Str::snake(class_basename($record)).'.deleted',
-                $record,
-            ));
     }
 }

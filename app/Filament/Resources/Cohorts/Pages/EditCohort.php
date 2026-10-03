@@ -18,12 +18,4 @@ class EditCohort extends EditRecord
     {
         $this->audit('updated');
     }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            $this->auditedDeleteAction()
-                ->modalDescription('Anggota tidak ikut terhapus, hanya keanggotaan kelompok ini. Modul & pengumuman yang terkait kelompok ini akan kehilangan penugasannya.'),
-        ];
-    }
 }

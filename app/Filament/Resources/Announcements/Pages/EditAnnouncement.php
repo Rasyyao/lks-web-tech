@@ -18,11 +18,4 @@ class EditAnnouncement extends EditRecord
     {
         $this->audit('updated');
     }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            $this->auditedDeleteAction(),
-        ];
-    }
 }

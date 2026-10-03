@@ -7,7 +7,6 @@ use App\Enums\QuestionType;
 use App\Filament\Concerns\RecordsAuditTrail;
 use App\Filament\Concerns\StacksFormSections;
 use App\Filament\Resources\Questions\QuestionResource;
-use App\Models\PracticeAttemptItem;
 use App\Models\Question;
 use Filament\Resources\Pages\EditRecord;
 
@@ -53,15 +52,5 @@ class EditQuestion extends EditRecord
         }
 
         $this->audit('updated');
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            $this->auditedDeleteAction()
-                // Practice history references questions; archive instead of delete.
-                ->hidden(fn (Question $record): bool => PracticeAttemptItem::where('question_id', $record->id)->exists())
-                ->modalDescription('Soal yang sudah pernah dipakai latihan tidak bisa dihapus — arsipkan saja.'),
-        ];
     }
 }

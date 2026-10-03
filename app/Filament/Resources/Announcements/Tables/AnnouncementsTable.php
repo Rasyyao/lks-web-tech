@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Announcements\Tables;
 
+use App\Filament\Actions\AuditedDeleteAction;
 use App\Models\Announcement;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -61,6 +62,7 @@ class AnnouncementsTable
             ])
             ->recordActions([
                 EditAction::make(),
+                AuditedDeleteAction::make(),
             ]);
     }
 }

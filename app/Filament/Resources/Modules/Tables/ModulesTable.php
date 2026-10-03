@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Modules\Tables;
 
+use App\Filament\Actions\AuditedDeleteAction;
 use App\Enums\ModuleStatus;
 use App\Enums\ModuleTrack;
 use App\Models\AuditLog;
@@ -72,6 +73,10 @@ class ModulesTable
             ])
             ->recordActions([
                 EditAction::make(),
+                // Deleting would cascade-delete student submissions; archive instead.
+                AuditedDeleteAction::make()
+                    ->hidden(fn (Module $record): bool => $record->submissions()->exists())
+                    ->modalDescription('Modul yang sudah memiliki pengumpulan tidak bisa dihapus — arsipkan saja.'),
                 Action::make('publish')
                     ->label('Terbitkan')
                     ->icon('heroicon-o-eye')

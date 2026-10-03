@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Cohorts\Tables;
 
+use App\Filament\Actions\AuditedDeleteAction;
 use App\Enums\CohortType;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -47,6 +48,8 @@ class CohortsTable
             ])
             ->recordActions([
                 EditAction::make(),
+                AuditedDeleteAction::make()
+                    ->modalDescription('Anggota tidak ikut terhapus, hanya keanggotaan kelompok ini. Modul & pengumuman yang terkait kelompok ini akan kehilangan penugasannya.'),
             ]);
     }
 }

@@ -16,6 +16,7 @@ use App\Filament\Resources\Modules\Pages\ListModules;
 use App\Filament\Resources\Modules\RelationManagers\AssetsRelationManager;
 use App\Filament\Resources\Modules\Pages\EditModule;
 use App\Filament\Resources\QuestionBankPapers\Pages\CreateQuestionBankPaper;
+use App\Filament\Resources\QuestionBankPapers\Pages\ListQuestionBankPapers;
 use App\Filament\Resources\Questions\Pages\CreateQuestion;
 use App\Filament\Resources\Questions\Pages\EditQuestion;
 use App\Filament\Resources\Questions\Pages\ListQuestions;
@@ -142,8 +143,22 @@ class AdminPanelCrudTest extends TestCase
 
     public function test_admin_can_not_deactivate_or_delete_themselves(): void
     {
-        Livewire::test(EditUser::class, ['record' => $this->admin->getKey()])
-            ->assertActionHidden('delete');
+        Livewire::test(ListUsers::class)
+            ->assertTableActionHidden('delete', $this->admin);
+    }
+
+    public function test_admin_can_delete_user_without_history_from_the_list_and_it_is_audited(): void
+    {
+        $student = User::where('username', '541221004')->first();
+        $student->practiceAttempts()->delete();
+        $student->submissions()->delete();
+
+        Livewire::test(ListUsers::class)
+            ->callTableAction('delete', $student)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertModelMissing($student);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'user.deleted', 'subject_id' => $student->id]);
     }
 
     public function test_password_reset_action_forces_password_change_and_is_audited(): void
@@ -399,8 +414,8 @@ class AdminPanelCrudTest extends TestCase
             'status' => 'received',
         ]);
 
-        Livewire::test(EditModule::class, ['record' => $module->getKey()])
-            ->assertActionHidden('delete');
+        Livewire::test(ListModules::class)
+            ->assertTableActionHidden('delete', $module);
     }
 
     public function test_module_asset_upload_stores_file_privately_and_removal_deletes_it(): void
@@ -464,6 +479,31 @@ class AdminPanelCrudTest extends TestCase
         $this->assertSame('lks-provinsi-2026-client', $paper->slug);
         $this->assertGreaterThan(0, $paper->file_size);
         Storage::disk('private')->assertExists($paper->file_path);
+    }
+
+    public function test_deleting_bank_soal_from_the_list_removes_the_pdf(): void
+    {
+        Storage::fake('private');
+        Storage::disk('private')->put('question-bank/x.pdf', '%PDF-1.4');
+
+        $paper = QuestionBankPaper::create([
+            'title' => 'Hapus saya',
+            'slug' => 'hapus-saya',
+            'year' => 2026,
+            'level' => CompetitionLevel::Kabupaten,
+            'module_type' => CompetitionModuleType::Client,
+            'file_name' => 'x.pdf',
+            'file_path' => 'question-bank/x.pdf',
+            'file_size' => 8,
+            'uploaded_by' => $this->admin->id,
+        ]);
+
+        Livewire::test(ListQuestionBankPapers::class)
+            ->callTableAction('delete', $paper)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertModelMissing($paper);
+        Storage::disk('private')->assertMissing('question-bank/x.pdf');
     }
 
     public function test_bank_soal_rejects_non_pdf_and_files_over_10mb(): void

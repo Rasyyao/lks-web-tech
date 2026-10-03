@@ -35,14 +35,4 @@ class EditModule extends EditRecord
     {
         $this->audit('updated');
     }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            $this->auditedDeleteAction()
-                // Deleting would cascade-delete student submissions; archive instead.
-                ->hidden(fn (Module $record): bool => $record->submissions()->exists())
-                ->modalDescription('Modul yang sudah memiliki pengumpulan tidak bisa dihapus — arsipkan saja.'),
-        ];
-    }
 }

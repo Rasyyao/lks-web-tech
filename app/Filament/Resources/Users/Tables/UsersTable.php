@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Filament\Actions\AuditedDeleteAction;
 use App\Models\AuditLog;
 use App\Models\User;
 use Filament\Actions\Action;
@@ -80,6 +81,12 @@ class UsersTable
             ])
             ->recordActions([
                 EditAction::make(),
+                // Never delete yourself, and never delete a user who has practice/submission
+                // history (it would cascade-delete it). Deactivate the account instead.
+                AuditedDeleteAction::make()
+                    ->hidden(fn (User $record): bool => $record->is(auth()->user())
+                        || $record->practiceAttempts()->exists()
+                        || $record->submissions()->exists()),
                 Action::make('resetPassword')
                     ->label('Reset sandi')
                     ->icon('heroicon-o-key')

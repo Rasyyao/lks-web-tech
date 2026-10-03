@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Questions\Tables;
 
+use App\Filament\Actions\AuditedDeleteAction;
+use App\Models\PracticeAttemptItem;
 use App\Enums\QuestionStatus;
 use App\Enums\QuestionType;
 use App\Models\AuditLog;
@@ -74,6 +76,10 @@ class QuestionsTable
             ])
             ->recordActions([
                 EditAction::make(),
+                // Practice history references questions; archive instead of delete.
+                AuditedDeleteAction::make()
+                    ->hidden(fn (Question $record): bool => PracticeAttemptItem::where('question_id', $record->id)->exists())
+                    ->modalDescription('Soal yang sudah pernah dipakai latihan tidak bisa dihapus — arsipkan saja.'),
                 Action::make('publish')
                     ->label('Terbitkan')
                     ->icon('heroicon-o-check-badge')

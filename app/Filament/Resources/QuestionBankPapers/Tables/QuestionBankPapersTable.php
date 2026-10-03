@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\QuestionBankPapers\Tables;
 
+use App\Filament\Actions\AuditedDeleteAction;
+use Illuminate\Support\Facades\Storage;
 use App\Enums\CompetitionLevel;
 use App\Enums\CompetitionModuleType;
 use App\Models\QuestionBankPaper;
@@ -64,6 +66,8 @@ class QuestionBankPapersTable
             ])
             ->recordActions([
                 EditAction::make(),
+                AuditedDeleteAction::make()
+                    ->after(fn (QuestionBankPaper $record) => Storage::disk('private')->delete($record->file_path)),
                 Action::make('download')
                     ->label('Unduh')
                     ->icon('heroicon-o-arrow-down-tray')
