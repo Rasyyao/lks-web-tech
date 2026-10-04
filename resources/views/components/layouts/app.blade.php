@@ -38,13 +38,7 @@
                         <x-nav-link href="{{ route('modules.index') }}" :active="request()->routeIs('modules.*')">
                             {{ __('general.modules') }}
                         </x-nav-link>
-                        <x-nav-link href="{{ route('practice.start') }}" :active="request()->routeIs('practice.*')">
-                            {{ __('general.practice') }}
-                        </x-nav-link>
-                        <x-nav-link href="{{ route('materials.index') }}" :active="request()->routeIs('materials.*')">
-                            {{ __('general.materials') }}
-                        </x-nav-link>
-                        <x-nav-link href="{{ route('roadmap.index') }}" :active="request()->routeIs('roadmap.*')">
+                        <x-nav-link href="{{ route('roadmap.index') }}" :active="request()->routeIs('roadmap.*') || request()->routeIs('materials.*')">
                             Belajar
                         </x-nav-link>
                     @endif
@@ -137,8 +131,8 @@
                     <x-mobile-nav-link href="{{ route('modules.index') }}" :active="request()->routeIs('modules.*')" icon="book">
                         {{ __('general.modules') }}
                     </x-mobile-nav-link>
-                    <x-mobile-nav-link href="{{ route('practice.start') }}" :active="request()->routeIs('practice.*')" icon="pencil">
-                        {{ __('general.practice') }}
+                    <x-mobile-nav-link href="{{ route('roadmap.index') }}" :active="request()->routeIs('roadmap.*') || request()->routeIs('materials.*')" icon="map">
+                        Belajar
                     </x-mobile-nav-link>
                     <x-mobile-nav-link href="{{ route('leaderboard') }}" :active="request()->routeIs('leaderboard')" icon="trophy">
                         {{ __('general.leaderboard') }}

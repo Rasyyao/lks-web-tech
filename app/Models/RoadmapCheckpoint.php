@@ -13,12 +13,16 @@ class RoadmapCheckpoint extends Model
         'slug',
         'position',
         'prompt',
+        'options',
+        'correct_answer',
+        'explanation',
     ];
 
     protected function casts(): array
     {
         return [
             'position' => 'integer',
+            'options' => 'array',
         ];
     }
 

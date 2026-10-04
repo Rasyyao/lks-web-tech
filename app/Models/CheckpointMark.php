@@ -11,6 +11,7 @@ class CheckpointMark extends Model
         'user_id',
         'roadmap_checkpoint_id',
         'checkpoint_slug',
+        'selected_answer',
         'is_understood',
         'marked_at',
     ];

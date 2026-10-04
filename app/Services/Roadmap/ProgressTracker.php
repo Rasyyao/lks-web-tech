@@ -83,6 +83,56 @@ class ProgressTracker
     }
 
     /**
+     * Submit an answer to a checkpoint quiz.
+     *
+     * @return array{success: bool, is_correct: bool, correct_answer: ?string, explanation: ?string}
+     */
+    public function answerCheckpoint(User $user, string $checkpointSlug, string $selectedAnswer): array
+    {
+        $checkpoint = RoadmapCheckpoint::where('slug', $checkpointSlug)->first();
+        if (! $checkpoint) {
+            return [
+                'success' => false,
+                'is_correct' => false,
+                'correct_answer' => null,
+                'explanation' => null,
+            ];
+        }
+
+        $isCorrect = (strtolower(trim($selectedAnswer)) === strtolower(trim((string) $checkpoint->correct_answer)));
+
+        CheckpointMark::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'checkpoint_slug' => $checkpointSlug,
+            ],
+            [
+                'roadmap_checkpoint_id' => $checkpoint->id,
+                'selected_answer' => $selectedAnswer,
+                'is_understood' => $isCorrect,
+                'marked_at' => now(),
+            ]
+        );
+
+        $this->recordEvent($user, $isCorrect ? 'quiz_pass' : 'quiz_fail', [
+            'checkpoint_slug' => $checkpointSlug,
+            'selected_answer' => $selectedAnswer,
+            'is_correct' => $isCorrect,
+        ]);
+
+        if ($checkpoint->page && $checkpoint->page->kind === 'level') {
+            $this->recomputeLevelProgress($user, $checkpoint->page->slug);
+        }
+
+        return [
+            'success' => true,
+            'is_correct' => $isCorrect,
+            'correct_answer' => $checkpoint->correct_answer,
+            'explanation' => $checkpoint->explanation,
+        ];
+    }
+
+    /**
      * Record a coding exercise attempt.
      *
      * @param  array<string, mixed>  $results

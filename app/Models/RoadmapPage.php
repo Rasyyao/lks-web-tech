@@ -38,4 +38,37 @@ class RoadmapPage extends Model
     {
         return $this->hasMany(Exercise::class, 'level_slug', 'slug')->orderBy('position');
     }
+
+    public function previousLevel(): ?self
+    {
+        if ($this->kind !== 'level' || $this->position === 0) {
+            return null;
+        }
+
+        return self::where('kind', 'level')
+            ->where('position', $this->position - 1)
+            ->first();
+    }
+
+    public function isUnlockedFor(User $user): bool
+    {
+        if ($user->hasAnyRole(['mentor', 'admin'])) {
+            return true;
+        }
+
+        if ($this->kind !== 'level' || $this->position === 0) {
+            return true;
+        }
+
+        $prev = $this->previousLevel();
+        if (! $prev) {
+            return true;
+        }
+
+        $prevProgress = LevelProgress::where('user_id', $user->id)
+            ->where('level_slug', $prev->slug)
+            ->first();
+
+        return (bool) ($prevProgress?->is_completed ?? false);
+    }
 }

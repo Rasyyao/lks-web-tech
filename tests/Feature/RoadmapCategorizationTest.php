@@ -26,9 +26,12 @@ class RoadmapCategorizationTest extends TestCase
     {
         $this->actingAs($this->student)
             ->get('/materi')
+            ->assertRedirect(route('roadmap.index', ['tab' => 'silabus']));
+
+        $this->actingAs($this->student)
+            ->get(route('roadmap.index', ['tab' => 'silabus']))
             ->assertOk()
-            ->assertSee('Modul')
-            ->assertSee('Roadmap LKS Web Technologies')
+            ->assertSee('Silabus')
             ->assertSee('Modul Client-Side')
             ->assertSee('Modul Server-Side')
             ->assertSee(route('materials.roadmap', 'client'))

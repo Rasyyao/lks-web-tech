@@ -371,6 +371,8 @@ class RoadmapContentImporter
                         $prompt = trim(substr($cleanLine, 2));
                         $cpSlug = "{$levelSlug}-cp-{$cpIndex}";
 
+                        $quizData = RoadmapQuizCatalog::getQuizForPrompt($prompt);
+
                         RoadmapCheckpoint::updateOrCreate(
                             [
                                 'roadmap_page_id' => $page->id,
@@ -379,6 +381,9 @@ class RoadmapContentImporter
                             [
                                 'position' => $cpIndex,
                                 'prompt' => $prompt,
+                                'options' => $quizData['options'],
+                                'correct_answer' => $quizData['correct_answer'],
+                                'explanation' => $quizData['explanation'],
                             ]
                         );
                         $cpIndex++;
@@ -395,6 +400,102 @@ class RoadmapContentImporter
     protected function importDefaultExercises(): int
     {
         $exercises = [
+            // Level 0 Exercises
+            [
+                'slug' => 'l0-parse-protocol',
+                'level_slug' => 'level-0',
+                'title' => 'Cek Protokol URL (file:// vs http://)',
+                'type' => 'function',
+                'instructions' => "Tulis fungsi `parseProtocol(url)` yang menerima string URL (contoh: `'http://localhost:3000'` atau `'file:///C:/proyek/index.html'`) dan mengembalikan string nama protokolnya (`'http'`, `'https'`, atau `'file'`).",
+                'starter_code' => "function parseProtocol(url) {\n    if (url.startsWith('https://')) return 'https';\n    if (url.startsWith('http://')) return 'http';\n    if (url.startsWith('file://')) return 'file';\n    return 'unknown';\n}",
+                'test_cases' => [
+                    ['input' => ['http://localhost:8080'], 'expected' => 'http'],
+                    ['input' => ['https://lks.smktelkom-pwt.sch.id'], 'expected' => 'https'],
+                    ['input' => ['file:///home/user/index.html'], 'expected' => 'file'],
+                ],
+                'is_required' => true,
+                'position' => 1,
+            ],
+            [
+                'slug' => 'l0-is-local-env',
+                'level_slug' => 'level-0',
+                'title' => 'Deteksi Lingkungan Server Lokal',
+                'type' => 'function',
+                'instructions' => "Tulis fungsi `isLocalEnv(hostname)` yang mengembalikan `true` jika hostname adalah `'localhost'`, `'127.0.0.1'`, atau `'::1'`, dan `false` jika selain itu.",
+                'starter_code' => "function isLocalEnv(hostname) {\n    return ['localhost', '127.0.0.1', '::1'].includes(hostname);\n}",
+                'test_cases' => [
+                    ['input' => ['localhost'], 'expected' => true],
+                    ['input' => ['127.0.0.1'], 'expected' => true],
+                    ['input' => ['smktelkom-pwt.sch.id'], 'expected' => false],
+                ],
+                'is_required' => true,
+                'position' => 2,
+            ],
+
+            // Level 1 Exercises
+            [
+                'slug' => 'l1-hitung-total-harga',
+                'level_slug' => 'level-1',
+                'title' => 'Kalkulasi Total Diskon Formulir',
+                'type' => 'function',
+                'instructions' => 'Tulis fungsi `hitungTotalHarga(harga, diskonPersen)` yang menerima harga asli dan persentase diskon (0-100), lalu mengembalikan harga akhir setelah dipotong diskon.',
+                'starter_code' => "function hitungTotalHarga(harga, diskonPersen) {\n    return harga - (harga * (diskonPersen / 100));\n}",
+                'test_cases' => [
+                    ['input' => [100000, 10], 'expected' => 90000],
+                    ['input' => [50000, 50], 'expected' => 25000],
+                    ['input' => [20000, 0], 'expected' => 20000],
+                ],
+                'is_required' => true,
+                'position' => 1,
+            ],
+            [
+                'slug' => 'l1-validasi-email',
+                'level_slug' => 'level-1',
+                'title' => 'Validasi Format Alamat Email',
+                'type' => 'function',
+                'instructions' => "Tulis fungsi `validasiEmail(email)` yang mengembalikan `true` jika email memiliki tanda '@' dan titik '.' setelahnya, serta bukan di posisi awal/akhir.",
+                'starter_code' => "function validasiEmail(email) {\n    const at = email.indexOf('@');\n    const dot = email.lastIndexOf('.');\n    return at > 0 && dot > at + 1 && dot < email.length - 1;\n}",
+                'test_cases' => [
+                    ['input' => ['siswa@telkom.sch.id'], 'expected' => true],
+                    ['input' => ['invalid-email'], 'expected' => false],
+                    ['input' => ['user@domain'], 'expected' => false],
+                ],
+                'is_required' => true,
+                'position' => 2,
+            ],
+
+            // Level 2 Exercises
+            [
+                'slug' => 'l2-hitung-kolom-grid',
+                'level_slug' => 'level-2',
+                'title' => 'Penentuan Jumlah Kolom Grid Responsif',
+                'type' => 'function',
+                'instructions' => 'Tulis fungsi `hitungKolomGrid(lebarLayar)` yang mengembalikan angka jumlah kolom kartu: lebar < 640 mengembalikan 1, lebar antara 640 s.d. 1023 mengembalikan 2, dan lebar >= 1024 mengembalikan 4.',
+                'starter_code' => "function hitungKolomGrid(lebarLayar) {\n    if (lebarLayar < 640) return 1;\n    if (lebarLayar < 1024) return 2;\n    return 4;\n}",
+                'test_cases' => [
+                    ['input' => [400], 'expected' => 1],
+                    ['input' => [768], 'expected' => 2],
+                    ['input' => [1200], 'expected' => 4],
+                ],
+                'is_required' => true,
+                'position' => 1,
+            ],
+            [
+                'slug' => 'l2-clamp-skala',
+                'level_slug' => 'level-2',
+                'title' => 'Batasi Rentang Zoom (Clamp)',
+                'type' => 'function',
+                'instructions' => 'Tulis fungsi `clampSkala(skala, min, max)` yang memastikan nilai `skala` tidak lebih kecil dari `min` dan tidak lebih besar dari `max`.',
+                'starter_code' => "function clampSkala(skala, min, max) {\n    return Math.min(Math.max(skala, min), max);\n}",
+                'test_cases' => [
+                    ['input' => [0.4, 0.5, 3.0], 'expected' => 0.5],
+                    ['input' => [3.5, 0.5, 3.0], 'expected' => 3.0],
+                    ['input' => [1.8, 0.5, 3.0], 'expected' => 1.8],
+                ],
+                'is_required' => true,
+                'position' => 2,
+            ],
+
             // Level 3 Exercises
             [
                 'slug' => 'l3-format-durasi',
@@ -423,6 +524,35 @@ class RoadmapContentImporter
                     ['input' => [30000], 'expected' => 'Rp30.000'],
                     ['input' => [1500000], 'expected' => 'Rp1.500.000'],
                     ['input' => [500], 'expected' => 'Rp500'],
+                ],
+                'is_required' => true,
+                'position' => 2,
+            ],
+
+            // Level 4 Exercises
+            [
+                'slug' => 'l4-buat-pin',
+                'level_slug' => 'level-4',
+                'title' => 'Konstruksi Objek Data Pin Marker',
+                'type' => 'function',
+                'instructions' => 'Tulis fungsi `buatPin(id, nama, lat, lng)` yang mengembalikan objek dengan format: `{ id, nama, lat: Number(lat), lng: Number(lng), active: false }`.',
+                'starter_code' => "function buatPin(id, nama, lat, lng) {\n    return {\n        id: id,\n        nama: nama,\n        lat: Number(lat),\n        lng: Number(lng),\n        active: false\n    };\n}",
+                'test_cases' => [
+                    ['input' => ['pin-1', 'Stasiun Gambir', '-6.176', '106.830'], 'expected' => ['id' => 'pin-1', 'nama' => 'Stasiun Gambir', 'lat' => -6.176, 'lng' => 106.83, 'active' => false]],
+                ],
+                'is_required' => true,
+                'position' => 1,
+            ],
+            [
+                'slug' => 'l4-filter-kategori',
+                'level_slug' => 'level-4',
+                'title' => 'Filter Pin Lokasi Berdasarkan Kategori',
+                'type' => 'function',
+                'instructions' => "Tulis fungsi `filterPin(pins, kategori)` yang memfilter array objek pin berdasarkan properti `kategori`. Jika kategori adalah `'semua'`, kembalikan seluruh pin.",
+                'starter_code' => "function filterPin(pins, kategori) {\n    if (kategori === 'semua') return pins;\n    return pins.filter(p => p.kategori === kategori);\n}",
+                'test_cases' => [
+                    ['input' => [[['nama' => 'A', 'kategori' => 'wisata'], ['nama' => 'B', 'kategori' => 'hotel']], 'wisata'], 'expected' => [['nama' => 'A', 'kategori' => 'wisata']]],
+                    ['input' => [[['nama' => 'A', 'kategori' => 'wisata']], 'semua'], 'expected' => [['nama' => 'A', 'kategori' => 'wisata']]],
                 ],
                 'is_required' => true,
                 'position' => 2,
@@ -541,6 +671,44 @@ class RoadmapContentImporter
                             ['A', 'C', 'D'],
                         ],
                     ],
+                ],
+                'is_required' => true,
+                'position' => 2,
+            ],
+
+            // Level 8 Exercises
+            [
+                'slug' => 'l8-hitung-total-rute',
+                'level_slug' => 'level-8',
+                'title' => 'Akumulasi Jarak dan Biaya Rute Multi-Segmen',
+                'type' => 'function',
+                'instructions' => 'Tulis fungsi `akumulasiRute(segmenList)` yang menerima array segmen `{ jarakKm: number, tarifPerKm: number }` dan mengembalikan objek `{ totalJarak: number, totalBiaya: number }`.',
+                'starter_code' => "function akumulasiRute(segmenList) {\n    let totalJarak = 0;\n    let totalBiaya = 0;\n    for (const s of segmenList) {\n        totalJarak += s.jarakKm;\n        totalBiaya += s.jarakKm * s.tarifPerKm;\n    }\n    return { totalJarak, totalBiaya };\n}",
+                'test_cases' => [
+                    [
+                        'input' => [
+                            [
+                                ['jarakKm' => 10, 'tarifPerKm' => 2000],
+                                ['jarakKm' => 5, 'tarifPerKm' => 3000],
+                            ],
+                        ],
+                        'expected' => ['totalJarak' => 15, 'totalBiaya' => 35000],
+                    ],
+                ],
+                'is_required' => true,
+                'position' => 1,
+            ],
+            [
+                'slug' => 'l8-kecepatan-rata-rata',
+                'level_slug' => 'level-8',
+                'title' => 'Hitung Estimasi Kecepatan Tempuh Rata-Rata',
+                'type' => 'function',
+                'instructions' => 'Tulis fungsi `hitungKecepatan(jarakKm, waktuJam)` yang menghitung `jarakKm / waktuJam` dibulatkan ke 1 tempat desimal. Jika waktuJam <= 0, kembalikan 0.',
+                'starter_code' => "function hitungKecepatan(jarakKm, waktuJam) {\n    if (waktuJam <= 0) return 0;\n    return Math.round((jarakKm / waktuJam) * 10) / 10;\n}",
+                'test_cases' => [
+                    ['input' => [120, 2.5], 'expected' => 48],
+                    ['input' => [50, 1.2], 'expected' => 41.7],
+                    ['input' => [10, 0], 'expected' => 0],
                 ],
                 'is_required' => true,
                 'position' => 2,

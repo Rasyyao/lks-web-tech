@@ -92,19 +92,17 @@ export function processFlashAlerts() {
         });
         flashContainer.removeAttribute('data-error');
     } else if (warningMsg) {
-        TelkomSwal.fire({
+        TelkomToast.fire({
             icon: 'warning',
-            title: 'Peringatan',
-            text: warningMsg,
-            confirmButtonText: 'Mengerti',
+            title: warningMsg,
+            timer: 3500,
         });
         flashContainer.removeAttribute('data-warning');
     } else if (infoMsg || statusMsg) {
-        TelkomSwal.fire({
+        TelkomToast.fire({
             icon: 'info',
-            title: 'Informasi',
-            text: infoMsg || statusMsg,
-            confirmButtonText: 'OK',
+            title: infoMsg || statusMsg,
+            timer: 3500,
         });
         flashContainer.removeAttribute('data-info');
         flashContainer.removeAttribute('data-status');

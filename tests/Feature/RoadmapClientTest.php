@@ -51,11 +51,89 @@ class RoadmapClientTest extends TestCase
             ->assertSee('Level 0:')
             ->assertSee('Level 7:');
 
+        // Level 0 is unlocked by default
+        $this->actingAs($student)
+            ->get(route('roadmap.level', 'level-0'))
+            ->assertOk()
+            ->assertSee('Level 0: Alat dan cara kerja web')
+            ->assertSee('Lanjut ke Kuis Pemahaman');
+
+        // Level 7 is locked if level 6 is not completed
         $this->actingAs($student)
             ->get(route('roadmap.level', 'level-7'))
+            ->assertRedirect(route('roadmap.index'))
+            ->assertSessionHas('warning');
+    }
+
+    public function test_student_can_view_dedicated_quiz_and_task_pages(): void
+    {
+        $student = User::where('username', '541221001')->first();
+
+        // Level 0 quiz
+        $this->actingAs($student)
+            ->get(route('roadmap.quiz', 'level-0'))
             ->assertOk()
-            ->assertSee('Level 7: Graph, BFS, DFS, dan pencarian rute')
-            ->assertSee('7.1 Graph');
+            ->assertSee('Kuis Pemahaman')
+            ->assertSee('1. Materi')
+            ->assertSee('2. Kuis')
+            ->assertSee('3. Tugas Coding');
+
+        // Level 0 task
+        $this->actingAs($student)
+            ->get(route('roadmap.task', 'level-0'))
+            ->assertOk()
+            ->assertSee('Tugas Coding')
+            ->assertSee('Editor JavaScript');
+
+        // Locked level quiz & task redirect to roadmap.index
+        $this->actingAs($student)
+            ->get(route('roadmap.quiz', 'level-7'))
+            ->assertRedirect(route('roadmap.index'))
+            ->assertSessionHas('warning');
+
+        $this->actingAs($student)
+            ->get(route('roadmap.task', 'level-7'))
+            ->assertRedirect(route('roadmap.index'))
+            ->assertSessionHas('warning');
+    }
+
+    public function test_student_can_answer_quiz_checkpoint_and_get_validated(): void
+    {
+        $student = User::where('username', '541221001')->first();
+        $cp = RoadmapPage::where('slug', 'level-0')->first()->checkpoints->first();
+
+        // Submit wrong answer
+        $response = $this->actingAs($student)
+            ->postJson(route('activity.checkpoint.answer'), [
+                'checkpoint_slug' => $cp->slug,
+                'selected_answer' => 'Z',
+            ]);
+
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'is_correct' => false,
+            ]);
+
+        // Submit correct answer
+        $response = $this->actingAs($student)
+            ->postJson(route('activity.checkpoint.answer'), [
+                'checkpoint_slug' => $cp->slug,
+                'selected_answer' => $cp->correct_answer,
+            ]);
+
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'is_correct' => true,
+            ]);
+
+        $this->assertDatabaseHas('checkpoint_marks', [
+            'user_id' => $student->id,
+            'checkpoint_slug' => $cp->slug,
+            'is_understood' => true,
+            'selected_answer' => $cp->correct_answer,
+        ]);
     }
 
     public function test_student_can_toggle_checkpoint_understanding(): void

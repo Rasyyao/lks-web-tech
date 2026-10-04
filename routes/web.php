@@ -11,17 +11,17 @@ use App\Livewire\Shared\Profile;
 use App\Livewire\Shared\QuestionBankIndex;
 use App\Livewire\Student\AnswerSheet;
 use App\Livewire\Student\Dashboard;
-use App\Livewire\Student\MaterialIndex;
 use App\Livewire\Student\MaterialRoadmap;
 use App\Livewire\Student\MaterialShow;
 use App\Livewire\Student\ModuleIndex;
 use App\Livewire\Student\ModuleShow;
 use App\Livewire\Student\MyActivity;
 use App\Livewire\Student\PracticeAttempt as PracticeAttemptPage;
-use App\Livewire\Student\PracticeStart;
 use App\Livewire\Student\RoadmapLevel;
 use App\Livewire\Student\RoadmapOverview;
+use App\Livewire\Student\RoadmapQuiz;
 use App\Livewire\Student\RoadmapReference;
+use App\Livewire\Student\RoadmapTask;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -71,9 +71,9 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
             ->middleware('module.visible')
             ->name('modules.show');
 
-        // Practice
+        // Practice (Redirect index to Bank Soal)
         Route::prefix('latihan')->group(function () {
-            Route::get('/', PracticeStart::class)->name('practice.start');
+            Route::get('/', fn () => redirect()->route('question-bank.index'))->name('practice.start');
             Route::get('/{attempt}', PracticeAttemptPage::class)
                 ->middleware(['attempt.owner', 'attempt.open'])
                 ->name('practice.attempt');
@@ -82,8 +82,14 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
                 ->name('practice.result');
         });
 
-        // Materials & Topic Bank Soal
-        Route::get('/materi', MaterialIndex::class)->name('materials.index');
+        // Materials & Topic Bank Soal (Merged into /belajar)
+        Route::get('/materi', function () {
+            if (request()->has('jalur') && in_array(request('jalur'), ['client', 'server'], true)) {
+                return redirect()->route('materials.roadmap', ['track' => request('jalur')]);
+            }
+
+            return redirect()->route('roadmap.index', ['tab' => 'silabus']);
+        })->name('materials.index');
         Route::get('/materi/roadmap/{track}', MaterialRoadmap::class)->name('materials.roadmap');
         Route::get('/materi/{topic:slug}', MaterialShow::class)->name('materials.show');
 
@@ -91,6 +97,8 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
         Route::get('/belajar', RoadmapOverview::class)->name('roadmap.index');
         Route::get('/belajar/referensi/{slug}', RoadmapReference::class)->name('roadmap.reference');
         Route::get('/belajar/{slug}', RoadmapLevel::class)->name('roadmap.level');
+        Route::get('/belajar/{slug}/kuis', RoadmapQuiz::class)->name('roadmap.quiz');
+        Route::get('/belajar/{slug}/tugas', RoadmapTask::class)->name('roadmap.task');
 
         // Student's Activity Dashboard
         Route::get('/aktivitas-saya', MyActivity::class)->name('activity.my');
@@ -113,6 +121,9 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
     Route::post('/aktivitas/checkpoint-toggle', [RoadmapActivityController::class, 'toggleCheckpoint'])
         ->middleware('throttle:60,1')
         ->name('activity.checkpoint.toggle');
+    Route::post('/aktivitas/checkpoint-answer', [RoadmapActivityController::class, 'answerCheckpoint'])
+        ->middleware('throttle:60,1')
+        ->name('activity.checkpoint.answer');
     Route::post('/belajar/latihan/{exercise}/percobaan', [RoadmapActivityController::class, 'submitExercise'])
         ->middleware('throttle:60,1')
         ->name('roadmap.exercise.submit');

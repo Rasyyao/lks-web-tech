@@ -85,6 +85,25 @@
         </div>
     </div>
 
+    @if($track === 'client')
+        <div class="bg-sheet border-2 border-brand/40 rounded-panel p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-pass"></span>
+                    <h3 class="text-base sm:text-lg font-bold text-ink">
+                        Tugas Coding & Kuis Interaktif Tersedia!
+                    </h3>
+                </div>
+                <p class="text-xs sm:text-sm text-ink-muted">
+                    Modul Client-Side ini telah dilengkapi 9 level pembelajaran interaktif, visualisasi konsep SVG/koordinat, kuis pemahaman, dan tugas coding langsung di browser.
+                </p>
+            </div>
+            <a href="{{ route('roadmap.index') }}" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded hover:bg-brand-deep transition-colors shrink-0">
+                <span>Buka Roadmap & Tugas Coding →</span>
+            </a>
+        </div>
+    @endif
+
     {{-- Roadmap Steps List --}}
     <div class="space-y-4">
         <div class="flex items-center justify-between border-b border-rule pb-3">

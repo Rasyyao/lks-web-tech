@@ -27,6 +27,7 @@
                         <span class="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-brand/10 text-brand-deep border border-brand/20">
                             LEVEL {{ $page->position }}
                         </span>
+
                         @if($page->estimated_time)
                             <span class="text-xs bg-paper border border-rule text-ink-muted px-2 py-0.5 rounded font-mono">
                                 ⏱ {{ $page->estimated_time }}
@@ -60,10 +61,35 @@
                         <div class="{{ $progress->is_completed ? 'bg-pass' : 'bg-brand' }} h-full transition-all duration-300" style="width: {{ $progress->percent_complete }}%"></div>
                     </div>
                     <div class="text-xs text-ink-muted text-left">
-                        {{ $progress->checkpoints_marked }}/{{ $progress->checkpoints_total }} cek dipahami • {{ $progress->exercises_passed }}/{{ $progress->exercises_total }} latihan
+                        {{ $progress->checkpoints_marked }}/{{ $progress->checkpoints_total }} kuis selesai • {{ $progress->exercises_passed }}/{{ $progress->exercises_total }} latihan
                     </div>
                 </div>
             </div>
+        </div>
+
+        {{-- Level Navigation Stepper / Tabs --}}
+        <div class="flex items-center gap-2 border-b border-rule">
+            <a
+                href="{{ route('roadmap.level', $page->slug) }}"
+                class="py-3 px-4 font-bold text-xs sm:text-sm border-b-2 border-brand text-brand-deep transition-colors inline-flex items-center gap-2"
+            >
+                <span>📖</span>
+                <span>1. Materi Pembelajaran</span>
+            </a>
+            <a
+                href="{{ route('roadmap.quiz', $page->slug) }}"
+                class="py-3 px-4 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-2"
+            >
+                <span>❓</span>
+                <span>2. Kuis Pemahaman ({{ count($markedCheckpointSlugs) }}/{{ $page->checkpoints->count() }})</span>
+            </a>
+            <a
+                href="{{ route('roadmap.task', $page->slug) }}"
+                class="py-3 px-4 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-2"
+            >
+                <span>💻</span>
+                <span>3. Tugas Coding ({{ count($passedExerciseSlugs) }}/{{ $page->exercises->count() }})</span>
+            </a>
         </div>
 
         {{-- Main Grid: Content (Left) + Table of Contents / Progress Tracker (Right) --}}
@@ -283,162 +309,24 @@
                     </div>
                 @endif
 
-                {{-- Interactive Coding Exercises (LeetCode Style in Browser) --}}
-                @if($page->exercises->isNotEmpty())
-                    <div class="space-y-4 pt-4">
-                        <div class="flex items-center justify-between">
-                            <h2 class="text-lg sm:text-xl font-bold text-ink">
-                                Latihan Coding Interaktif
-                            </h2>
-                            <span class="text-xs text-ink-muted">Dijalankan dan diuji langsung di browser</span>
+
+
+                {{-- CTA to Dedicated Quiz & Tasks --}}
+                <div class="bg-sheet border border-rule rounded-panel p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-brand"></span>
+                            <h3 class="text-base sm:text-lg font-bold text-ink">Selesai Mempelajari Materi?</h3>
                         </div>
-
-                        @foreach($page->exercises as $exercise)
-                            @php
-                                $isPassed = in_array($exercise->slug, $passedExerciseSlugs, true);
-                            @endphp
-                            <div
-                                class="bg-sheet border {{ $isPassed ? 'border-pass/40' : 'border-rule' }} rounded-panel p-6 shadow-sm space-y-4"
-                                x-data="codeExerciseRunner({
-                                    id: {{ $exercise->id }},
-                                    slug: '{{ $exercise->slug }}',
-                                    starterCode: @js($exercise->starter_code),
-                                    testCases: @js($exercise->test_cases),
-                                    isPassed: @js($isPassed),
-                                    csrfToken: '{{ csrf_token() }}'
-                                })"
-                            >
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-rule pb-3">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-6 h-6 rounded-full bg-ink text-white font-mono text-xs flex items-center justify-center font-bold">
-                                            {{ $exercise->position }}
-                                        </span>
-                                        <h3 class="text-base sm:text-lg font-bold text-ink">
-                                            {{ $exercise->title }}
-                                        </h3>
-                                    </div>
-                                    <div>
-                                        <template x-if="passed">
-                                            <span class="px-2.5 py-0.5 rounded text-xs font-bold bg-pass/10 text-pass border border-pass/30 inline-flex items-center gap-1">
-                                                ✓ Lulus Tes
-                                            </span>
-                                        </template>
-                                        <template x-if="!passed">
-                                            <span class="px-2.5 py-0.5 rounded text-xs font-medium bg-paper text-ink-muted border border-rule">
-                                                Belum Lulus
-                                            </span>
-                                        </template>
-                                    </div>
-                                </div>
-
-                                {{-- Instructions --}}
-                                <div class="text-sm text-ink leading-relaxed whitespace-pre-line bg-paper/60 p-3 rounded border border-rule/60">
-                                    {{ $exercise->instructions }}
-                                </div>
-
-                                {{-- Code Editor Textarea --}}
-                                <div class="space-y-1">
-                                    <div class="flex justify-between items-center text-xs text-ink-muted font-mono">
-                                        <span>Editor JavaScript:</span>
-                                        <span>Tekan tombol jalankan untuk menguji</span>
-                                    </div>
-                                    <textarea
-                                        x-model="code"
-                                        rows="8"
-                                        class="w-full font-mono text-xs sm:text-sm bg-ink text-sheet p-3 rounded border border-rule focus:outline-none focus:ring-1 focus:ring-brand leading-relaxed"
-                                        spellcheck="false"
-                                        @keydown.tab.prevent="insertTab($event)"
-                                    ></textarea>
-                                </div>
-
-                                {{-- Action Bar --}}
-                                <div class="flex items-center justify-between gap-3 pt-1">
-                                    <button
-                                        type="button"
-                                        @click="runTests()"
-                                        :disabled="isRunning"
-                                        class="inline-flex items-center gap-2 px-4 py-2 bg-brand text-white text-xs sm:text-sm font-semibold rounded hover:bg-brand-deep disabled:opacity-50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-deep"
-                                    >
-                                        <span x-show="!isRunning">▶ Jalankan Kode & Uji Tes</span>
-                                        <span x-show="isRunning">Menguji...</span>
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        @click="resetCode()"
-                                        class="text-xs text-ink-muted hover:underline"
-                                    >
-                                        Reset ke Kode Awal
-                                    </button>
-                                </div>
-
-                                {{-- Results Box --}}
-                                <template x-if="hasRun">
-                                    <div class="border rounded p-4 text-xs font-mono space-y-3" :class="passed ? 'bg-pass/5 border-pass/30' : 'bg-tint/40 border-brand-deep/20'">
-                                        <div class="flex items-center justify-between">
-                                            <span class="font-bold text-sm" :class="passed ? 'text-pass' : 'text-brand-deep'" x-text="passed ? '✓ SEMUA TES LULUS!' : '✗ SEBAGIAN TES GAGAL'"></span>
-                                            <span class="text-ink-muted" x-text="`${passedCount}/${totalCount} tes lolos (${durationMs}ms)`"></span>
-                                        </div>
-
-                                        <div class="space-y-2 max-h-48 overflow-y-auto">
-                                            <template x-for="(test, i) in testResults" :key="i">
-                                                <div class="p-2 rounded border bg-sheet" :class="test.passed ? 'border-pass/30' : 'border-brand-deep/30'">
-                                                    <div class="flex items-center justify-between font-bold">
-                                                        <span :class="test.passed ? 'text-pass' : 'text-brand-deep'" x-text="`Tes #${i + 1}: ${test.passed ? 'Lulus' : 'Gagal'}`"></span>
-                                                    </div>
-                                                    <div class="text-ink-muted mt-1">Input: <span class="text-ink" x-text="JSON.stringify(test.input)"></span></div>
-                                                    <div class="text-ink-muted">Ekspektasi: <span class="text-pass" x-text="JSON.stringify(test.expected)"></span></div>
-                                                    <template x-if="!test.passed">
-                                                        <div class="text-brand-deep">Hasil Kamu: <span x-text="JSON.stringify(test.actual)"></span></div>
-                                                    </template>
-                                                    <template x-if="test.error">
-                                                        <div class="text-brand-deep font-semibold mt-1" x-text="test.error"></div>
-                                                    </template>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-                        @endforeach
+                        <p class="text-xs sm:text-sm text-ink-muted">Uji pemahaman teorimu dengan mengerjakan kuis pilihan ganda sebelum beralih ke tugas coding.</p>
                     </div>
-                @endif
+                    <a href="{{ route('roadmap.quiz', $page->slug) }}" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand text-white text-sm font-semibold rounded hover:bg-brand-deep transition-colors shrink-0">
+                        <span>Lanjut ke Kuis Pemahaman ({{ count($markedCheckpointSlugs) }}/{{ $page->checkpoints->count() }}) →</span>
+                    </a>
+                </div>
 
-                {{-- Checkpoints (Cek Pemahaman) --}}
-                @if($page->checkpoints->isNotEmpty())
-                    <section id="checkpoints" class="bg-sheet border border-rule rounded-panel p-6 shadow-sm space-y-4">
-                        <div class="border-b border-rule pb-3">
-                            <h2 class="text-lg sm:text-xl font-bold text-ink">
-                                Cek Pemahaman Konsep
-                            </h2>
-                            <p class="text-xs sm:text-sm text-ink-muted">
-                                Centang pertanyaan di bawah ini bila kamu sudah dapat menjawabnya dan memahaminya <strong>tanpa melihat catatan</strong>.
-                            </p>
-                        </div>
-
-                        <div class="space-y-3">
-                            @foreach($page->checkpoints as $cp)
-                                @php
-                                    $isUnderstood = in_array($cp->slug, $markedCheckpointSlugs, true);
-                                @endphp
-                                <label class="flex items-start gap-3 p-3 rounded border {{ $isUnderstood ? 'bg-pass/5 border-pass/30' : 'bg-paper border-rule' }} hover:border-brand/40 cursor-pointer transition-colors">
-                                    <input
-                                        type="checkbox"
-                                        class="mt-1 w-4 h-4 text-brand rounded border-rule focus:ring-brand cursor-pointer"
-                                        {{ $isUnderstood ? 'checked' : '' }}
-                                        wire:click="toggleCheckpoint('{{ $cp->slug }}')"
-                                    >
-                                    <div class="text-sm leading-relaxed {{ $isUnderstood ? 'text-ink font-medium' : 'text-ink-muted' }}">
-                                        {{ $cp->prompt }}
-                                    </div>
-                                </label>
-                            @endforeach
-                        </div>
-                    </section>
-                @endif
-
-                {{-- Bottom Navigation (Prev / Next) --}}
-                <div class="flex items-center justify-between pt-4 border-t border-rule">
+                {{-- Bottom Navigation (Prev / Next with Locked Gating Indicator) --}}
+                <div class="flex items-center justify-between pt-4 border-t border-rule gap-3">
                     @if($prevLevel)
                         <a href="{{ route('roadmap.level', $prevLevel->slug) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-sheet border border-rule text-ink text-sm font-medium rounded hover:bg-paper transition-colors">
                             ← {{ $prevLevel->title }}
@@ -448,9 +336,15 @@
                     @endif
 
                     @if($nextLevel)
-                        <a href="{{ route('roadmap.level', $nextLevel->slug) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-sm font-medium rounded hover:bg-brand-deep transition-colors">
-                            {{ $nextLevel->title }} →
-                        </a>
+                        @if($nextLevel->isUnlockedFor(auth()->user()))
+                            <a href="{{ route('roadmap.level', $nextLevel->slug) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white text-sm font-medium rounded hover:bg-brand-deep transition-colors">
+                                {{ $nextLevel->title }} →
+                            </a>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 px-4 py-2 bg-paper border border-rule text-ink-muted text-sm font-medium rounded cursor-not-allowed" title="Selesaikan modul ini (100%) untuk membuka level berikutnya">
+                                🔒 {{ $nextLevel->title }} (Terkunci)
+                            </span>
+                        @endif
                     @endif
                 </div>
 
@@ -476,14 +370,20 @@
                             </a>
                         @endforeach
 
-                        @if($page->checkpoints->isNotEmpty())
-                            <a href="#checkpoints" class="flex items-center justify-between py-1.5 px-2 rounded hover:bg-paper transition-colors text-ink font-medium border-t border-rule mt-2 pt-2">
-                                <span>Cek Pemahaman</span>
+                        <div class="pt-2 border-t border-rule space-y-1">
+                            <a href="{{ route('roadmap.quiz', $page->slug) }}" class="flex items-center justify-between py-1.5 px-2 rounded hover:bg-paper transition-colors text-ink font-medium">
+                                <span>Kuis Pemahaman</span>
                                 <span class="font-mono text-brand-deep font-bold">
                                     {{ count($markedCheckpointSlugs) }}/{{ $page->checkpoints->count() }}
                                 </span>
                             </a>
-                        @endif
+                            <a href="{{ route('roadmap.task', $page->slug) }}" class="flex items-center justify-between py-1.5 px-2 rounded hover:bg-paper transition-colors text-ink font-medium">
+                                <span>Tugas Coding</span>
+                                <span class="font-mono text-pass font-bold">
+                                    {{ count($passedExerciseSlugs) }}/{{ $page->exercises->count() }}
+                                </span>
+                            </a>
+                        </div>
                     </nav>
 
                     {{-- Pulse / Active Status Badge --}}

@@ -92,6 +92,28 @@ class RoadmapActivityController extends Controller
     }
 
     /**
+     * Submit answer to a checkpoint quiz.
+     */
+    public function answerCheckpoint(Request $request, ProgressTracker $tracker): JsonResponse
+    {
+        $request->validate([
+            'checkpoint_slug' => 'required|string|max:128',
+            'selected_answer' => 'required|string|max:16',
+        ]);
+
+        /** @var User $user */
+        $user = $request->user();
+
+        $result = $tracker->answerCheckpoint(
+            $user,
+            $request->input('checkpoint_slug'),
+            $request->input('selected_answer')
+        );
+
+        return response()->json($result);
+    }
+
+    /**
      * Record an exercise attempt from in-browser evaluation.
      */
     public function submitExercise(Request $request, Exercise $exercise, ProgressTracker $tracker): JsonResponse
