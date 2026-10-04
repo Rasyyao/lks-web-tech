@@ -29,6 +29,7 @@ class MaterialRoadmap extends Component
             ->get()
             ->filter(function ($topic) {
                 $track = $topic->track?->value ?? $topic->track;
+
                 return $track === $this->track;
             })
             ->values();
@@ -44,6 +45,6 @@ class MaterialRoadmap extends Component
             'topics' => $topics,
             'totalMaterials' => $totalMaterials,
             'totalQuestions' => $totalQuestions,
-        ])->title('Roadmap ' . $trackTitle . ' — Silabus LKS');
+        ])->title('Roadmap '.$trackTitle.' — Silabus LKS');
     }
 }

@@ -20,6 +20,6 @@ class MaterialShow extends Component
     {
         return view('livewire.student.material-show', [
             'topic' => $this->topic,
-        ])->title($this->topic->name . ' — Materi');
+        ])->title($this->topic->name.' — Materi');
     }
 }

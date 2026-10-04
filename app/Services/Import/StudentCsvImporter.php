@@ -12,8 +12,8 @@ class StudentCsvImporter
     /**
      * Import students from CSV file.
      *
-     * @param string $csvPath Full path to CSV file
-     * @param int|null $defaultCohortId Optional cohort ID to assign
+     * @param  string  $csvPath  Full path to CSV file
+     * @param  int|null  $defaultCohortId  Optional cohort ID to assign
      * @return array{
      *     created: int,
      *     skipped: int,
@@ -40,6 +40,7 @@ class StudentCsvImporter
         $header = fgetcsv($handle);
         if (! $header) {
             fclose($handle);
+
             return [
                 'created' => 0,
                 'skipped' => 0,
@@ -57,6 +58,7 @@ class StudentCsvImporter
 
         if ($nameIdx === false || $usernameIdx === false) {
             fclose($handle);
+
             return [
                 'created' => 0,
                 'skipped' => 0,
@@ -87,12 +89,14 @@ class StudentCsvImporter
                     'row' => $rowNum,
                     'reason' => 'Nama atau username kosong.',
                 ];
+
                 continue;
             }
 
             // Check duplicate username
             if (User::where('username', $username)->exists()) {
                 $skipped++;
+
                 continue;
             }
 
@@ -102,6 +106,7 @@ class StudentCsvImporter
                     'row' => $rowNum,
                     'reason' => "Email {$email} sudah digunakan.",
                 ];
+
                 continue;
             }
 

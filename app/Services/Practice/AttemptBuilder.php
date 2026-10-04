@@ -13,7 +13,7 @@ class AttemptBuilder
     /**
      * Build a new practice attempt for a student.
      *
-     * @param array{topic_ids?: array, difficulty_min?: int, difficulty_max?: int} $filters
+     * @param  array{topic_ids?: array, difficulty_min?: int, difficulty_max?: int}  $filters
      */
     public function build(
         User $user,

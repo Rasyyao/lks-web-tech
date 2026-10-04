@@ -6,6 +6,7 @@ use App\Enums\SubmissionStatus;
 use App\Jobs\RecomputeLeaderboard;
 use App\Models\AuditLog;
 use App\Models\Submission;
+use App\Services\Submissions\AutomatedJudgeService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -16,7 +17,9 @@ class SubmissionReview extends Component
     public Submission $submission;
 
     public ?int $manual_score = null;
+
     public string $feedback_md = '';
+
     public string $status = 'graded';
 
     public function mount(Submission $submission): void
@@ -29,10 +32,10 @@ class SubmissionReview extends Component
 
     public function rerunJudge(): void
     {
-        $judge = app(\App\Services\Submissions\AutomatedJudgeService::class);
+        $judge = app(AutomatedJudgeService::class);
         $results = $judge->evaluate($this->submission);
         $this->submission->refresh();
-        session()->flash('success', 'Evaluasi otomatis sistem (Playwright E2E & Postman API) berhasil dijalankan ulang. Skor: ' . ($results['score'] ?? 0) . '/100');
+        session()->flash('success', 'Evaluasi otomatis sistem (Playwright E2E & Postman API) berhasil dijalankan ulang. Skor: '.($results['score'] ?? 0).'/100');
     }
 
     public function applyTestScore(): void
@@ -105,6 +108,6 @@ class SubmissionReview extends Component
 
         return view('livewire.mentor.submission-review', [
             'history' => $history,
-        ])->title('Penilaian: ' . $this->submission->user->name);
+        ])->title('Penilaian: '.$this->submission->user->name);
     }
 }

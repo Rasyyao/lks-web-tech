@@ -15,7 +15,9 @@ use Livewire\Component;
 class Profile extends Component
 {
     public string $password = '';
+
     public string $password_confirmation = '';
+
     public bool $isPasswordMode = false;
 
     public function mount(): void

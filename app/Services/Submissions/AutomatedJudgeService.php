@@ -36,7 +36,7 @@ class AutomatedJudgeService
      */
     protected function evaluatePintarMenabung(string $zipPath): array
     {
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         $files = [];
 
         if ($zip->open($zipPath) === true) {
@@ -50,9 +50,9 @@ class AutomatedJudgeService
         }
 
         // Check file structures in the ZIP
-        $hasBackend = collect($files)->contains(fn($f) => str_contains($f, 'backend') || str_contains($f, 'api') || str_contains($f, 'routes/api.php') || str_contains($f, 'controller'));
-        $hasFrontend = collect($files)->contains(fn($f) => str_contains($f, 'index.html') || str_contains($f, 'app.vue') || str_contains($f, 'app.jsx') || str_contains($f, 'public') || str_contains($f, 'src'));
-        $hasSqlDump = collect($files)->contains(fn($f) => str_contains($f, '.sql'));
+        $hasBackend = collect($files)->contains(fn ($f) => str_contains($f, 'backend') || str_contains($f, 'api') || str_contains($f, 'routes/api.php') || str_contains($f, 'controller'));
+        $hasFrontend = collect($files)->contains(fn ($f) => str_contains($f, 'index.html') || str_contains($f, 'app.vue') || str_contains($f, 'app.jsx') || str_contains($f, 'public') || str_contains($f, 'src'));
+        $hasSqlDump = collect($files)->contains(fn ($f) => str_contains($f, '.sql'));
 
         // Load internal test suites
         $apiSuitePath = base_path('modules/modul-a/test-suite.json');
@@ -68,13 +68,13 @@ class AutomatedJudgeService
         $passedApi = $totalApiCases;
         $passedPw = $totalPwScenarios;
 
-        if (!$hasBackend) {
+        if (! $hasBackend) {
             $passedApi = max(0, $passedApi - 5);
         }
-        if (!$hasFrontend) {
+        if (! $hasFrontend) {
             $passedPw = max(0, $passedPw - 3);
         }
-        if (!$hasSqlDump) {
+        if (! $hasSqlDump) {
             $passedApi = max(0, $passedApi - 2);
         }
 
@@ -117,7 +117,7 @@ class AutomatedJudgeService
      */
     protected function evaluateClientSideMap(string $zipPath): array
     {
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         $files = [];
 
         if ($zip->open($zipPath) === true) {
@@ -130,8 +130,8 @@ class AutomatedJudgeService
             $zip->close();
         }
 
-        $hasIndex = collect($files)->contains(fn($f) => str_ends_with($f, 'index.html'));
-        $hasJs = collect($files)->contains(fn($f) => str_ends_with($f, '.js'));
+        $hasIndex = collect($files)->contains(fn ($f) => str_ends_with($f, 'index.html'));
+        $hasJs = collect($files)->contains(fn ($f) => str_ends_with($f, '.js'));
 
         $total = 5;
         $passed = ($hasIndex && $hasJs) ? 5 : 3;

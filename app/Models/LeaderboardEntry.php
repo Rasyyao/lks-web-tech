@@ -8,13 +8,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class LeaderboardEntry extends Model
 {
     protected $primaryKey = 'user_id';
+
     public $incrementing = false;
 
     protected $fillable = [
         'user_id',
         'question_points',
         'module_points',
+        'activity_points',
         'total',
+        'breakdown',
         'reached_at',
     ];
 
@@ -23,7 +26,9 @@ class LeaderboardEntry extends Model
         return [
             'question_points' => 'integer',
             'module_points' => 'integer',
+            'activity_points' => 'integer',
             'total' => 'integer',
+            'breakdown' => 'array',
             'reached_at' => 'datetime',
         ];
     }

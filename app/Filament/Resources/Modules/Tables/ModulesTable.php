@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\Modules\Tables;
 
-use App\Filament\Actions\AuditedDeleteAction;
 use App\Enums\ModuleStatus;
 use App\Enums\ModuleTrack;
+use App\Filament\Actions\AuditedDeleteAction;
 use App\Models\AuditLog;
 use App\Models\Module;
 use Filament\Actions\Action;

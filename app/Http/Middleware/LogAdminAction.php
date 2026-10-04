@@ -20,7 +20,7 @@ class LogAdminAction
         if (in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'])
             && $response->isSuccessful()) {
             AuditLog::record(
-                action: $request->method() . ' ' . $request->path(),
+                action: $request->method().' '.$request->path(),
                 meta: [
                     'route' => $request->route()?->getName(),
                     'method' => $request->method(),

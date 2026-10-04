@@ -71,8 +71,16 @@
                     {{ __('leaderboard.module_points') }}
                 </th>
                 <th scope="col" class="py-3 px-4 text-xs font-semibold text-ink-muted text-right">
+                    Aktivitas
+                </th>
+                <th scope="col" class="py-3 px-4 text-xs font-semibold text-ink-muted text-right">
                     {{ __('leaderboard.total') }}
                 </th>
+                @if(auth()->user()->hasAnyRole(['mentor', 'admin']))
+                    <th scope="col" class="py-3 px-4 text-xs font-semibold text-ink-muted text-center w-20">
+                        Aksi
+                    </th>
+                @endif
             </tr>
         </thead>
         <tbody class="divide-y divide-rule">
@@ -112,13 +120,23 @@
                     <td class="py-3 px-4 text-right tabular-nums text-ink">
                         {{ $entry->module_points }}
                     </td>
+                    <td class="py-3 px-4 text-right tabular-nums text-brand-deep font-mono">
+                        {{ $entry->activity_points ?? 0 }}
+                    </td>
                     <td class="py-3 px-4 text-right tabular-nums font-bold text-ink">
                         {{ $entry->total }}
                     </td>
+                    @if(auth()->user()->hasAnyRole(['mentor', 'admin']))
+                        <td class="py-3 px-4 text-center">
+                            <a href="{{ route('mentor.activity.timeline', $entry->user_id) }}" class="text-xs text-brand-deep hover:underline font-medium">
+                                Detail
+                            </a>
+                        </td>
+                    @endif
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="py-8 text-center text-sm text-ink-muted">
+                    <td colspan="{{ auth()->user()->hasAnyRole(['mentor', 'admin']) ? 8 : 7 }}" class="py-8 text-center text-sm text-ink-muted">
                         {{ __('leaderboard.empty') }}
                     </td>
                 </tr>

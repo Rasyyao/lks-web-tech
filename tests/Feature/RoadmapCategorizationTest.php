@@ -3,13 +3,10 @@
 namespace Tests\Feature;
 
 use App\Enums\ModuleTrack;
-use App\Livewire\Student\MaterialIndex;
-use App\Livewire\Student\MaterialRoadmap;
 use App\Models\Topic;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class RoadmapCategorizationTest extends TestCase
@@ -80,7 +77,7 @@ class RoadmapCategorizationTest extends TestCase
         $serverTopic = Topic::where('slug', 'laravel-framework')->firstOrFail();
 
         $this->actingAs($this->student)
-            ->get('/materi/' . $serverTopic->slug)
+            ->get('/materi/'.$serverTopic->slug)
             ->assertOk()
             ->assertSee('Laravel Framework & Eloquent ORM')
             ->assertSee('Modul Server-Side')

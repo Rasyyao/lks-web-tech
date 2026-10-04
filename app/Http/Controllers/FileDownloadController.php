@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ModuleAsset;
+use App\Models\QuestionBankPaper;
 use App\Models\Submission;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -38,7 +39,7 @@ class FileDownloadController extends Controller
     /**
      * Download a question bank PDF paper.
      */
-    public function questionPaper(\App\Models\QuestionBankPaper $paper)
+    public function questionPaper(QuestionBankPaper $paper)
     {
         if (! Storage::disk('private')->exists($paper->file_path)) {
             abort(404, 'Berkas PDF soal tidak ditemukan.');

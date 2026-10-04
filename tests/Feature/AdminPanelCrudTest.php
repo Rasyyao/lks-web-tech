@@ -9,12 +9,13 @@ use App\Enums\ModuleTrack;
 use App\Enums\QuestionStatus;
 use App\Enums\QuestionType;
 use App\Filament\Resources\Announcements\Pages\CreateAnnouncement;
+use App\Filament\Resources\AuditLogs\AuditLogResource;
 use App\Filament\Resources\AuditLogs\Pages\ListAuditLogs;
 use App\Filament\Resources\Cohorts\Pages\CreateCohort;
 use App\Filament\Resources\Modules\Pages\CreateModule;
+use App\Filament\Resources\Modules\Pages\EditModule;
 use App\Filament\Resources\Modules\Pages\ListModules;
 use App\Filament\Resources\Modules\RelationManagers\AssetsRelationManager;
-use App\Filament\Resources\Modules\Pages\EditModule;
 use App\Filament\Resources\QuestionBankPapers\Pages\CreateQuestionBankPaper;
 use App\Filament\Resources\QuestionBankPapers\Pages\ListQuestionBankPapers;
 use App\Filament\Resources\Questions\Pages\CreateQuestion;
@@ -27,13 +28,13 @@ use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\AuditLog;
-use App\Models\Announcement;
 use App\Models\Cohort;
 use App\Models\Module;
 use App\Models\Question;
 use App\Models\QuestionBankPaper;
 use App\Models\Topic;
 use App\Models\User;
+use Database\Seeders\DatabaseSeeder;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -54,7 +55,7 @@ class AdminPanelCrudTest extends TestCase
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\DatabaseSeeder::class);
+        $this->seed(DatabaseSeeder::class);
 
         $this->admin = User::where('username', 'admin')->first();
         $this->actingAs($this->admin);
@@ -539,7 +540,7 @@ class AdminPanelCrudTest extends TestCase
 
         Livewire::test(ListAuditLogs::class)->assertSuccessful();
 
-        $this->assertFalse(\App\Filament\Resources\AuditLogs\AuditLogResource::canCreate());
-        $this->assertFalse(\App\Filament\Resources\AuditLogs\AuditLogResource::canDeleteAny());
+        $this->assertFalse(AuditLogResource::canCreate());
+        $this->assertFalse(AuditLogResource::canDeleteAny());
     }
 }

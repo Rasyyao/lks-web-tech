@@ -4,6 +4,7 @@ namespace App\Livewire\Student;
 
 use App\Models\Module;
 use App\Models\Submission;
+use App\Services\Submissions\AutomatedJudgeService;
 use App\Services\Submissions\SubmissionStorage;
 use App\Services\Submissions\ZipUploadValidator;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,9 @@ class ModuleShow extends Component
     use WithFileUploads;
 
     public Module $module;
+
     public $zipFile;
+
     public ?array $testSuite = null;
 
     public function mount(Module $module): void
@@ -38,7 +41,7 @@ class ModuleShow extends Component
     public function submitZip(
         ZipUploadValidator $validator,
         SubmissionStorage $storage,
-        \App\Services\Submissions\AutomatedJudgeService $judge
+        AutomatedJudgeService $judge
     ): void {
         $user = Auth::user();
 
@@ -53,6 +56,7 @@ class ModuleShow extends Component
 
         if (! $validationResult['valid']) {
             $this->addError('zipFile', $validationResult['error']);
+
             return;
         }
 

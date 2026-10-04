@@ -7,7 +7,7 @@ use App\Enums\CompetitionModuleType;
 use App\Livewire\Shared\QuestionBankIndex;
 use App\Models\QuestionBankPaper;
 use App\Models\User;
-use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -19,13 +19,15 @@ class QuestionBankTest extends TestCase
     use RefreshDatabase;
 
     protected User $student;
+
     protected User $admin;
+
     protected User $mentor;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\DatabaseSeeder::class);
+        $this->seed(DatabaseSeeder::class);
 
         $this->student = User::where('username', '541221001')->first();
         $this->admin = User::where('username', 'admin')->first();

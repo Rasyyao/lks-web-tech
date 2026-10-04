@@ -25,8 +25,8 @@ class PracticeTest extends TestCase
     public function test_practice_attempt_stores_question_snapshot_immutably(): void
     {
         $dewi = User::where('username', '541221001')->first();
-        $builder = new AttemptBuilder();
-        $scorer = new AttemptScorer();
+        $builder = new AttemptBuilder;
+        $scorer = new AttemptScorer;
 
         $attempt = $builder->build($dewi, 3);
         $item = $attempt->items->first();
@@ -60,8 +60,8 @@ class PracticeTest extends TestCase
     public function test_attempt_scorer_grades_snapshot_correctly(): void
     {
         $dimas = User::where('username', '541221003')->first();
-        $builder = new AttemptBuilder();
-        $scorer = new AttemptScorer();
+        $builder = new AttemptBuilder;
+        $scorer = new AttemptScorer;
 
         $attempt = $builder->build($dimas, 2);
 

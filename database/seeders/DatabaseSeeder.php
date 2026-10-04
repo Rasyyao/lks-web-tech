@@ -1297,9 +1297,9 @@ MD,
         ]);
 
         // 10. Simulate some practice attempts for student Dewi & Raka
-        $attemptBuilder = new AttemptBuilder();
-        $attemptScorer = new AttemptScorer();
-        $recomputeJob = new RecomputeLeaderboard();
+        $attemptBuilder = new AttemptBuilder;
+        $attemptScorer = new AttemptScorer;
+        $recomputeJob = new RecomputeLeaderboard;
 
         // Dewi finishes an attempt
         $dewiAttempt = $attemptBuilder->build($dewi, 5);
@@ -1428,6 +1428,9 @@ MD,
 
         // 10. Question Bank Papers (Bank Soal LKS)
         $this->call(QuestionBankSeeder::class);
+
+        // 11. Interactive Learning Roadmap (Client-Side Pin Map)
+        $this->call(RoadmapClientSeeder::class);
 
         // Recompute leaderboard for seeded students
         $recomputeJob->forUser($dewi->id);

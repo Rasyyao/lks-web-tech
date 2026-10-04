@@ -31,11 +31,13 @@ class MaterialIndex extends Component
 
         $clientTopics = $allTopics->filter(function ($topic) {
             $track = $topic->track?->value ?? $topic->track;
+
             return $track === 'client';
         })->values();
 
         $serverTopics = $allTopics->filter(function ($topic) {
             $track = $topic->track?->value ?? $topic->track;
+
             return $track === 'server';
         })->values();
 

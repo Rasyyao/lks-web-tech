@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Middleware\EnforceSelectionFreeze;
 use App\Http\Middleware\EnsureAttemptOpen;
 use App\Http\Middleware\EnsureAttemptOwner;
 use App\Http\Middleware\EnsureModuleAcceptingSubmissions;
 use App\Http\Middleware\EnsureModuleVisible;
 use App\Http\Middleware\EnsureUserIsActive;
-use App\Http\Middleware\EnforceSelectionFreeze;
 use App\Http\Middleware\ForcePasswordChange;
 use App\Http\Middleware\LogAdminAction;
 use App\Http\Middleware\SecurityHeaders;
@@ -14,6 +14,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Middleware\RoleMiddleware;
+use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -23,9 +26,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'role' => RoleMiddleware::class,
+            'permission' => PermissionMiddleware::class,
+            'role_or_permission' => RoleOrPermissionMiddleware::class,
             'active' => EnsureUserIsActive::class,
             'password.fresh' => ForcePasswordChange::class,
             'module.visible' => EnsureModuleVisible::class,

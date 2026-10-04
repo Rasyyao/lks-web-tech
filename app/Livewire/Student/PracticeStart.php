@@ -15,9 +15,13 @@ use Livewire\Component;
 class PracticeStart extends Component
 {
     public string $topic = 'all';
+
     public string $difficulty = 'all';
+
     public int $questionCount = 10;
+
     public bool $useTimer = false;
+
     public int $timerMinutes = 15;
 
     public function mount(): void
@@ -54,6 +58,7 @@ class PracticeStart extends Component
         if ($attempt->items()->count() === 0) {
             $attempt->delete();
             $this->addError('general', __('practice.no_questions_found'));
+
             return;
         }
 

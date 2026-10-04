@@ -13,10 +13,13 @@ use Livewire\Component;
 class PracticeAttempt extends Component
 {
     public PracticeAttemptModel $attempt;
+
     public int $currentIndex = 0;
+
     public bool $isReviewMode = false;
 
     public ?int $selectedOptionId = null;
+
     public string $shortAnswerText = '';
 
     public function mount(PracticeAttempt $attempt, AttemptScorer $scorer): void
@@ -27,6 +30,7 @@ class PracticeAttempt extends Component
         if ($this->attempt->isTimerExpired()) {
             $scorer->score($this->attempt);
             $this->redirectRoute('practice.result', $this->attempt->id);
+
             return;
         }
 

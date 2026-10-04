@@ -18,8 +18,7 @@ class AnswerNormalizer
     /**
      * Check if student answer matches any accepted normalized answer.
      *
-     * @param string $studentAnswer
-     * @param array<string> $acceptedAnswers
+     * @param  array<string>  $acceptedAnswers
      */
     public static function matches(string $studentAnswer, array $acceptedAnswers): bool
     {

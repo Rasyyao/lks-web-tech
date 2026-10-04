@@ -2,8 +2,9 @@
 
 namespace App\Filament\Resources\Cohorts\Tables;
 
-use App\Filament\Actions\AuditedDeleteAction;
 use App\Enums\CohortType;
+use App\Filament\Actions\AuditedDeleteAction;
+use App\Models\Cohort;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -41,7 +42,7 @@ class CohortsTable
                     ->options(CohortType::class),
                 SelectFilter::make('year')
                     ->label('Tahun')
-                    ->options(fn (): array => \App\Models\Cohort::query()
+                    ->options(fn (): array => Cohort::query()
                         ->orderByDesc('year')
                         ->pluck('year', 'year')
                         ->all()),

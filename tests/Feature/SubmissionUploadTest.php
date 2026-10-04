@@ -27,7 +27,7 @@ class SubmissionUploadTest extends TestCase
     {
         $dewi = User::where('username', '541221001')->first();
         $module = Module::first();
-        $validator = new ZipUploadValidator();
+        $validator = new ZipUploadValidator;
 
         // Create a fake text file renamed as .zip
         $fakeFile = UploadedFile::fake()->create('project.zip', 100, 'text/plain');
@@ -41,7 +41,7 @@ class SubmissionUploadTest extends TestCase
     {
         $dewi = User::where('username', '541221001')->first();
         $module = Module::first();
-        $validator = new ZipUploadValidator();
+        $validator = new ZipUploadValidator;
 
         // 25 MB file (over 20 MB limit)
         $oversizedFile = UploadedFile::fake()->create('heavy.zip', 26000, 'application/zip');
@@ -56,10 +56,10 @@ class SubmissionUploadTest extends TestCase
     {
         $dewi = User::where('username', '541221001')->first();
         $module = Module::first();
-        $storage = new SubmissionStorage();
+        $storage = new SubmissionStorage;
 
         // Create genuine ZIP file in memory (starts with PK\x03\x04)
-        $zipContent = "PK\x03\x04" . str_repeat("\x00", 50);
+        $zipContent = "PK\x03\x04".str_repeat("\x00", 50);
         $tempPath = tempnam(sys_get_temp_dir(), 'zip_test');
         file_put_contents($tempPath, $zipContent);
 

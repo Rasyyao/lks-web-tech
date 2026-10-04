@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Enums\ModuleStatus;
 use App\Models\Module;
 use App\Models\User;
 

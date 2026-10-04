@@ -44,6 +44,9 @@
                         <x-nav-link href="{{ route('materials.index') }}" :active="request()->routeIs('materials.*')">
                             {{ __('general.materials') }}
                         </x-nav-link>
+                        <x-nav-link href="{{ route('roadmap.index') }}" :active="request()->routeIs('roadmap.*')">
+                            Belajar
+                        </x-nav-link>
                     @endif
                     @if(auth()->user()->hasRole(['mentor', 'admin']))
                         <x-nav-link href="{{ route('mentor.submissions') }}" :active="request()->routeIs('mentor.*')">

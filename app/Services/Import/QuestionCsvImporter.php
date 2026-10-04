@@ -16,8 +16,8 @@ class QuestionCsvImporter
     /**
      * Import questions from CSV file.
      *
-     * @param string $csvPath Full path to CSV file
-     * @param User $creator User importing the questions
+     * @param  string  $csvPath  Full path to CSV file
+     * @param  User  $creator  User importing the questions
      * @return array{
      *     created: int,
      *     skipped: int,
@@ -41,6 +41,7 @@ class QuestionCsvImporter
         $header = fgetcsv($handle);
         if (! $header) {
             fclose($handle);
+
             return [
                 'created' => 0,
                 'skipped' => 0,
@@ -55,6 +56,7 @@ class QuestionCsvImporter
         foreach ($requiredCols as $req) {
             if (! isset($colMap[$req])) {
                 fclose($handle);
+
                 return [
                     'created' => 0,
                     'skipped' => 0,
@@ -85,6 +87,7 @@ class QuestionCsvImporter
 
             if ($topicName === '' || $body === '') {
                 $failed[] = ['row' => $rowNum, 'reason' => 'Topik atau teks soal kosong.'];
+
                 continue;
             }
 
@@ -98,6 +101,7 @@ class QuestionCsvImporter
 
             if (! $type) {
                 $failed[] = ['row' => $rowNum, 'reason' => "Tipe soal \"{$typeRaw}\" tidak valid."];
+
                 continue;
             }
 
@@ -113,21 +117,25 @@ class QuestionCsvImporter
                 $optB = $getVal('option_b');
                 if ($optA === '' || $optB === '') {
                     $failed[] = ['row' => $rowNum, 'reason' => 'Pilihan A dan B wajib diisi untuk pilihan ganda.'];
+
                     continue;
                 }
                 if (! in_array($correct, ['a', 'b', 'c', 'd'], true)) {
                     $failed[] = ['row' => $rowNum, 'reason' => 'Kunci jawaban pilihan ganda harus berupa A, B, C, atau D.'];
+
                     continue;
                 }
             } elseif ($type === QuestionType::TrueFalse) {
                 if (! in_array($correct, ['true', 'false', 'benar', 'salah', '1', '0'], true)) {
                     $failed[] = ['row' => $rowNum, 'reason' => 'Kunci jawaban benar/salah harus berupa "true" atau "false".'];
+
                     continue;
                 }
             } elseif ($type === QuestionType::ShortAnswer) {
                 $accepted = $getVal('accepted_answers');
                 if ($accepted === '' && $correct === '') {
                     $failed[] = ['row' => $rowNum, 'reason' => 'Jawaban yang diterima (accepted_answers) wajib diisi untuk isian singkat.'];
+
                     continue;
                 }
             }

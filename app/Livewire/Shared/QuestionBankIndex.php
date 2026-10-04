@@ -20,20 +20,29 @@ class QuestionBankIndex extends Component
 
     // Filters
     public string $search = '';
+
     public string $yearFilter = '';
+
     public string $levelFilter = '';
+
     public string $moduleTypeFilter = '';
 
     // Modal state for Admin/Mentor Upload & Edit
     public bool $showModal = false;
+
     public ?int $editingId = null;
 
     // Form fields
     public string $title = '';
+
     public ?int $year = null;
+
     public string $level = 'nasional';
+
     public string $module_type = 'client';
+
     public string $description = '';
+
     public $pdfFile = null;
 
     public function mount(): void
@@ -161,7 +170,7 @@ class QuestionBankIndex extends Component
 
             session()->flash('success', "Berkas soal \"{$paper->title}\" berhasil diperbarui.");
         } else {
-            $slug = QuestionBankPaper::generateUniqueSlug($this->title . '-' . $this->year . '-' . $this->module_type);
+            $slug = QuestionBankPaper::generateUniqueSlug($this->title.'-'.$this->year.'-'.$this->module_type);
             $originalName = $this->pdfFile->getClientOriginalName();
             $storedPath = $this->pdfFile->store('question-bank', 'private');
             $fileSize = $this->pdfFile->getSize();
@@ -239,9 +248,9 @@ class QuestionBankIndex extends Component
 
         if ($this->search !== '') {
             $query->where(function ($q) {
-                $q->where('title', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%')
-                  ->orWhere('file_name', 'like', '%' . $this->search . '%');
+                $q->where('title', 'like', '%'.$this->search.'%')
+                    ->orWhere('description', 'like', '%'.$this->search.'%')
+                    ->orWhere('file_name', 'like', '%'.$this->search.'%');
             });
         }
 

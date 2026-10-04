@@ -49,9 +49,10 @@ class QuestionBankPaper extends Model
         return Attribute::make(
             get: function () {
                 if ($this->file_size >= 1048576) {
-                    return number_format($this->file_size / 1048576, 2) . ' MB';
+                    return number_format($this->file_size / 1048576, 2).' MB';
                 }
-                return number_format($this->file_size / 1024, 1) . ' KB';
+
+                return number_format($this->file_size / 1024, 1).' KB';
             }
         );
     }

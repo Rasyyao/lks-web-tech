@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\Topics\Tables;
 
+use App\Enums\ModuleTrack;
 use App\Filament\Actions\AuditedDeleteAction;
 use App\Models\Topic;
 use Filament\Actions\EditAction;
-use App\Enums\ModuleTrack;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class TopicsTable

@@ -2,8 +2,13 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FileDownloadController;
+use App\Http\Controllers\RoadmapActivityController;
+use App\Livewire\Mentor\StudentActivityTimeline;
+use App\Livewire\Mentor\SubmissionInbox;
+use App\Livewire\Mentor\SubmissionReview;
 use App\Livewire\Shared\LeaderboardPage;
 use App\Livewire\Shared\Profile;
+use App\Livewire\Shared\QuestionBankIndex;
 use App\Livewire\Student\AnswerSheet;
 use App\Livewire\Student\Dashboard;
 use App\Livewire\Student\MaterialIndex;
@@ -11,10 +16,12 @@ use App\Livewire\Student\MaterialRoadmap;
 use App\Livewire\Student\MaterialShow;
 use App\Livewire\Student\ModuleIndex;
 use App\Livewire\Student\ModuleShow;
+use App\Livewire\Student\MyActivity;
 use App\Livewire\Student\PracticeAttempt as PracticeAttemptPage;
 use App\Livewire\Student\PracticeStart;
-use App\Livewire\Mentor\SubmissionInbox;
-use App\Livewire\Mentor\SubmissionReview;
+use App\Livewire\Student\RoadmapLevel;
+use App\Livewire\Student\RoadmapOverview;
+use App\Livewire\Student\RoadmapReference;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -75,11 +82,40 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
                 ->name('practice.result');
         });
 
-        // Materials
+        // Materials & Topic Bank Soal
         Route::get('/materi', MaterialIndex::class)->name('materials.index');
         Route::get('/materi/roadmap/{track}', MaterialRoadmap::class)->name('materials.roadmap');
         Route::get('/materi/{topic:slug}', MaterialShow::class)->name('materials.show');
+
+        // Interactive Learning Roadmap (Belajar Mandiri)
+        Route::get('/belajar', RoadmapOverview::class)->name('roadmap.index');
+        Route::get('/belajar/referensi/{slug}', RoadmapReference::class)->name('roadmap.reference');
+        Route::get('/belajar/{slug}', RoadmapLevel::class)->name('roadmap.level');
+
+        // Student's Activity Dashboard
+        Route::get('/aktivitas-saya', MyActivity::class)->name('activity.my');
     });
+
+    /*
+    |----------------------------------------------------------------------
+    | Activity Tracking & Exercise Attempt Endpoints
+    |----------------------------------------------------------------------
+    */
+    Route::post('/aktivitas/heartbeat', [RoadmapActivityController::class, 'heartbeat'])
+        ->middleware('throttle:60,1')
+        ->name('activity.heartbeat');
+    Route::post('/aktivitas/event', [RoadmapActivityController::class, 'event'])
+        ->middleware('throttle:120,1')
+        ->name('activity.event');
+    Route::post('/aktivitas/section-read', [RoadmapActivityController::class, 'markSectionRead'])
+        ->middleware('throttle:60,1')
+        ->name('activity.section.read');
+    Route::post('/aktivitas/checkpoint-toggle', [RoadmapActivityController::class, 'toggleCheckpoint'])
+        ->middleware('throttle:60,1')
+        ->name('activity.checkpoint.toggle');
+    Route::post('/belajar/latihan/{exercise}/percobaan', [RoadmapActivityController::class, 'submitExercise'])
+        ->middleware('throttle:60,1')
+        ->name('roadmap.exercise.submit');
 
     /*
     |----------------------------------------------------------------------
@@ -91,10 +127,11 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
         ->group(function () {
             Route::get('/pengumpulan', SubmissionInbox::class)->name('mentor.submissions');
             Route::get('/pengumpulan/{submission}', SubmissionReview::class)->name('mentor.submission.review');
+            Route::get('/aktivitas/{user}', StudentActivityTimeline::class)->name('mentor.activity.timeline');
         });
 
     // Bank Soal LKS (accessible by all authenticated users)
-    Route::get('/bank-soal', \App\Livewire\Shared\QuestionBankIndex::class)->name('question-bank.index');
+    Route::get('/bank-soal', QuestionBankIndex::class)->name('question-bank.index');
 
     /*
     |----------------------------------------------------------------------

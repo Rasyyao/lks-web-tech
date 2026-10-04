@@ -110,6 +110,26 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasOne(LeaderboardEntry::class);
     }
 
+    public function levelProgress(): HasMany
+    {
+        return $this->hasMany(LevelProgress::class);
+    }
+
+    public function dailyActivities(): HasMany
+    {
+        return $this->hasMany(DailyActivity::class);
+    }
+
+    public function activityEvents(): HasMany
+    {
+        return $this->hasMany(ActivityEvent::class);
+    }
+
+    public function exerciseAttempts(): HasMany
+    {
+        return $this->hasMany(ExerciseAttempt::class);
+    }
+
     /**
      * Check if user belongs to any of the given cohorts.
      */

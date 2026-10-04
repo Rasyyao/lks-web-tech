@@ -27,9 +27,9 @@ class LeaderboardTest extends TestCase
         $dimas = User::where('username', '541221003')->first();
         $question = Question::first();
 
-        $builder = new AttemptBuilder();
-        $scorer = new AttemptScorer();
-        $recompute = new RecomputeLeaderboard();
+        $builder = new AttemptBuilder;
+        $scorer = new AttemptScorer;
+        $recompute = new RecomputeLeaderboard;
 
         // Attempt 1: Dimas answers $question correctly
         $attempt1 = $builder->build($dimas, 1, ['topic_ids' => [$question->topic_id]]);

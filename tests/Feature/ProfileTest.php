@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Livewire\Shared\Profile;
-use App\Models\AuditLog;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
