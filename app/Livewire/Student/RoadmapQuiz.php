@@ -101,12 +101,17 @@ class RoadmapQuiz extends Component
             ->distinct('exercise_id')
             ->count('exercise_id');
 
+        $allLevels = RoadmapPage::where('kind', 'level')->orderBy('position')->get();
+        $currentIndex = $allLevels->search(fn ($p) => $p->id === $this->page->id);
+        $nextLevel = $currentIndex < ($allLevels->count() - 1) ? $allLevels->get($currentIndex + 1) : null;
+
         return view('livewire.student.roadmap-quiz', [
             'page' => $this->page,
             'progress' => $progress,
             'checkpointMarks' => $checkpointMarks,
             'markedCheckpointSlugs' => $markedCheckpointSlugs,
             'passedExerciseCount' => $passedExerciseCount,
+            'nextLevel' => $nextLevel,
         ])->title('Kuis: '.$this->page->title.' — LKS Web Technology');
     }
 }

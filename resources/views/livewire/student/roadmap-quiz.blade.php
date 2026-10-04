@@ -83,10 +83,11 @@
             </a>
             <a
                 href="{{ route('roadmap.task', $page->slug) }}"
-                class="py-3 px-4 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-2"
+                class="py-3 px-4 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-1.5"
             >
                 <span>💻</span>
-                <span>3. Tugas Coding ({{ $passedExerciseCount }}/{{ $page->exercises->count() }})</span>
+                <span>3. Tugas Coding</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 bg-paper border border-rule rounded text-ink-muted">Coming Soon</span>
             </a>
         </div>
 
@@ -294,13 +295,25 @@
                             </template>
 
                             <template x-if="currentIndex === total - 1">
-                                <a
-                                    href="{{ route('roadmap.task', $page->slug) }}"
-                                    class="px-4 py-2 bg-brand text-white text-xs sm:text-sm font-semibold rounded hover:bg-brand-deep transition-colors inline-flex items-center gap-1.5"
-                                    style="color: #ffffff !important; background-color: #c92a2a !important;"
-                                >
-                                    Lanjut ke Tugas Coding →
-                                </a>
+                                <div class="flex items-center gap-2">
+                                    @if($nextLevel)
+                                        <a
+                                            href="{{ route('roadmap.level', $nextLevel->slug) }}"
+                                            class="px-4 py-2 bg-brand text-white text-xs sm:text-sm font-semibold rounded hover:bg-brand-deep transition-colors inline-flex items-center gap-1.5"
+                                            style="color: #ffffff !important; background-color: #c92a2a !important;"
+                                        >
+                                            Lanjut ke {{ $nextLevel->title }} →
+                                        </a>
+                                    @else
+                                        <a
+                                            href="{{ route('roadmap.index') }}"
+                                            class="px-4 py-2 bg-pass text-white text-xs sm:text-sm font-semibold rounded hover:bg-pass/90 transition-colors inline-flex items-center gap-1.5"
+                                            style="color: #ffffff !important;"
+                                        >
+                                            ✓ Selamat! Seluruh Roadmap Selesai
+                                        </a>
+                                    @endif
+                                </div>
                             </template>
                         </div>
                     </div>
@@ -318,9 +331,21 @@
                 ← Kembali ke Materi Pembelajaran
             </a>
 
-            <a href="{{ route('roadmap.task', $page->slug) }}" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded hover:bg-brand-deep transition-colors w-full sm:w-auto justify-center">
-                Lanjut ke Tugas Coding ({{ $passedExerciseCount }}/{{ $page->exercises->count() }}) →
-            </a>
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <a href="{{ route('roadmap.task', $page->slug) }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-paper border border-dashed border-rule text-ink-muted text-xs font-medium rounded hover:border-brand/40 hover:text-ink transition-colors">
+                    💻 Tugas Coding (Coming Soon)
+                </a>
+
+                @if($nextLevel)
+                    <a href="{{ route('roadmap.level', $nextLevel->slug) }}" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white text-sm font-semibold rounded hover:bg-brand-deep transition-colors w-full sm:w-auto justify-center" style="color: #ffffff !important; background-color: #c92a2a !important;">
+                        Lanjut ke {{ $nextLevel->title }} →
+                    </a>
+                @else
+                    <a href="{{ route('roadmap.index') }}" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-pass text-white text-sm font-semibold rounded hover:bg-pass/90 transition-colors w-full sm:w-auto justify-center" style="color: #ffffff !important;">
+                        ✓ Selesai ke Roadmap
+                    </a>
+                @endif
+            </div>
         </div>
 
     </div>

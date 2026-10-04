@@ -195,11 +195,31 @@ class ProgressTracker
             ->distinct('exercise_id')
             ->count('exercise_id');
 
-        $totalItems = $sectionsTotal + $checkpointsTotal + $exercisesTotal;
-        $completedItems = $sectionsRead + $checkpointsMarked + $exercisesPassed;
+        $quizzesComplete = ($checkpointsTotal === 0 || $checkpointsMarked >= $checkpointsTotal);
+        $exercisesComplete = ($exercisesTotal === 0 || $exercisesPassed >= $exercisesTotal);
 
-        $percent = $totalItems > 0 ? (int) round(($completedItems / $totalItems) * 100) : 100;
-        $isCompleted = ($percent >= 100);
+        // While Tugas Coding feature is on hold (Coming Soon), completing quizzes completes the level
+        if ($quizzesComplete) {
+            $isCompleted = true;
+            $percent = 100;
+            $sectionsRead = $sectionsTotal;
+
+            foreach ($page->sections as $sec) {
+                SectionRead::firstOrCreate([
+                    'user_id' => $user->id,
+                    'section_slug' => $sec->slug,
+                ], [
+                    'roadmap_section_id' => $sec->id,
+                    'read_at' => now(),
+                ]);
+            }
+        } else {
+            $totalItems = $sectionsTotal + $checkpointsTotal;
+            $completedItems = $sectionsRead + $checkpointsMarked;
+
+            $percent = $totalItems > 0 ? (int) round(($completedItems / $totalItems) * 100) : 100;
+            $isCompleted = ($percent >= 100);
+        }
 
         $progress = LevelProgress::updateOrCreate(
             [

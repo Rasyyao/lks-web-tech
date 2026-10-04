@@ -3,12 +3,14 @@
 namespace App\Livewire\Student;
 
 use App\Models\CheckpointMark;
+use App\Models\Exercise;
 use App\Models\ExerciseAttempt;
 use App\Models\RoadmapPage;
 use App\Services\Roadmap\ProgressTracker;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 #[Layout('components.layouts.app')]
@@ -33,6 +35,32 @@ class RoadmapTask extends Component
 
             return;
         }
+    }
+
+    public function saveExerciseAttempt(int $exerciseId, string $code, bool $passed, array $results = [], int $durationMs = 0): void
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return;
+        }
+
+        $exercise = Exercise::findOrFail($exerciseId);
+        $tracker = app(ProgressTracker::class);
+
+        $tracker->recordExerciseAttempt(
+            $user,
+            $exercise,
+            $code,
+            $passed,
+            $results,
+            $durationMs
+        );
+    }
+
+    #[On('exercise-passed')]
+    public function onExercisePassed(): void
+    {
+        // Component will re-render automatically
     }
 
     public function render(ProgressTracker $tracker): View

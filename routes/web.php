@@ -127,6 +127,9 @@ Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
     Route::post('/belajar/latihan/{exercise}/percobaan', [RoadmapActivityController::class, 'submitExercise'])
         ->middleware('throttle:60,1')
         ->name('roadmap.exercise.submit');
+    Route::post('/belajar/exercise/{exercise}/submit', [RoadmapActivityController::class, 'submitExercise'])
+        ->middleware('throttle:60,1')
+        ->name('roadmap.exercise.submit.alias');
 
     /*
     |----------------------------------------------------------------------

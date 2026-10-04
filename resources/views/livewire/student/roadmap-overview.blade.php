@@ -18,7 +18,7 @@
                                 Modul Client-Side
                             </h3>
                             <span class="inline-flex items-center text-[11px] font-mono font-medium px-2.5 py-1 rounded bg-pass/10 text-pass border border-pass/30 uppercase tracking-wider font-bold">
-                                ✓ Terintegrasi Tugas
+                                ✓ Materi & Kuis Interaktif
                             </span>
                         </div>
 
@@ -27,7 +27,7 @@
                         </p>
 
                         <p class="text-sm text-ink-muted leading-relaxed">
-                            Terdiri dari 4 tahap dan 9 level pembelajaran interaktif. Setiap level dilengkapi materi teori, kuis pemahaman, dan tugas coding yang dijalankan langsung di browser.
+                            Terdiri dari 4 tahap dan 9 level pembelajaran interaktif. Setiap level dilengkapi materi teori terstruktur dan kuis pemahaman konsep (tugas coding interaktif segera hadir).
                         </p>
 
                         @if(!empty($clientStats['topics_preview']))
@@ -60,7 +60,7 @@
                             class="inline-flex items-center justify-center text-xs font-semibold px-5 py-2.5 rounded bg-brand hover:bg-brand-deep transition-colors text-white"
                             style="color: #ffffff !important; background-color: #c92a2a !important;"
                         >
-                            Buka Roadmap & Tugas Coding
+                            Buka Roadmap Belajar
                         </a>
                     </div>
                 </div>
@@ -136,7 +136,7 @@
                             Roadmap Belajar Mandiri: Pin Map
                         </h1>
                         <p class="text-sm sm:text-base text-ink-muted leading-relaxed">
-                            Kurikulum persiapan LKS Web Technologies bidang Client-Side. Materi teori, kuis pemahaman konsep, dan tugas coding interaktif terintegrasi langsung dalam setiap tahapan level.
+                            Kurikulum persiapan LKS Web Technologies bidang Client-Side. Materi teori dan kuis pemahaman konsep terintegrasi langsung dalam setiap tahapan level (tugas coding interaktif segera hadir).
                         </p>
                     </div>
 
@@ -262,7 +262,7 @@
                                                     <span>Materi: <strong>{{ $level->sections->count() }} bagian</strong></span>
                                                     <span>Kuis: <strong>{{ $checkpointsMarked }}/{{ $level->checkpoints->count() }} selesai</strong></span>
                                                     @if($level->exercises->isNotEmpty())
-                                                        <span>Tugas Coding: <strong class="text-brand-deep">{{ $exercisesPassed }}/{{ $level->exercises->count() }} lulus</strong></span>
+                                                        <span>Tugas: <strong class="text-ink-muted font-normal italic">Coming Soon</strong></span>
                                                     @endif
                                                 </div>
                                             </div>
@@ -291,11 +291,11 @@
                                                     @if($level->exercises->isNotEmpty())
                                                         <a
                                                             href="{{ route('roadmap.task', $level->slug) }}"
-                                                            class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded transition-colors {{ $exercisesPassed === $level->exercises->count() ? 'bg-pass/10 border border-pass/30 text-pass' : 'bg-brand text-white hover:bg-brand-deep' }}"
-                                                            style="{{ $exercisesPassed !== $level->exercises->count() ? 'color: #ffffff !important; background-color: #c92a2a !important;' : '' }}"
-                                                            title="Tugas Coding Interaktif"
+                                                            class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded bg-paper border border-dashed border-rule text-ink-muted hover:border-brand/40 hover:text-ink transition-colors"
+                                                            title="Tugas Coding Interaktif — Sedang Disiapkan (Coming Soon)"
                                                         >
-                                                            <span>💻 Tugas ({{ $exercisesPassed }}/{{ $level->exercises->count() }})</span>
+                                                            <span>💻 Tugas</span>
+                                                            <span class="text-[10px] font-mono px-1.5 py-0.5 bg-sheet border border-rule rounded text-ink-muted">Coming Soon</span>
                                                         </a>
                                                     @endif
                                                 </div>
