@@ -3,10 +3,14 @@
 namespace App\Livewire\Student;
 
 use App\Enums\ModuleStatus;
+use App\Enums\SubmissionStatus;
 use App\Models\Announcement;
+use App\Models\DailyActivity;
 use App\Models\LeaderboardEntry;
+use App\Models\LevelProgress;
 use App\Models\Module;
 use App\Models\PracticeAttempt;
+use App\Models\RoadmapPage;
 use App\Models\Topic;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -39,24 +43,43 @@ class Dashboard extends Component
             ->take(2)
             ->get();
 
-        // 2. Modules in progress with deadlines
+        // 2. Modules Assigned to Student
         $modules = Module::query()
             ->where('status', ModuleStatus::Published)
             ->whereHas('cohorts', fn ($q) => $q->whereIn('cohorts.id', $cohortIds))
-            ->where('closes_at', '>=', now())
+            ->orderBy('level')
             ->orderBy('closes_at')
-            ->take(3)
             ->with(['submissions' => fn ($q) => $q->where('user_id', $user->id)])
             ->get();
 
-        // 3. Latest attempt
-        $latestAttempt = PracticeAttempt::query()
-            ->where('user_id', $user->id)
-            ->whereNotNull('submitted_at')
-            ->latest('submitted_at')
+        // Module statistics
+        $totalModulesCount = $modules->count();
+        $submittedModulesCount = $modules->filter(fn ($m) => $m->submissions->isNotEmpty())->count();
+        $gradedModulesCount = $modules->filter(fn ($m) => $m->submissions->contains('status', SubmissionStatus::Graded))->count();
+        $pendingModulesCount = $modules->filter(fn ($m) => $m->submissions->contains('status', SubmissionStatus::Received))->count();
+        $moduleProgressPercent = $totalModulesCount > 0 ? (int) round(($submittedModulesCount / $totalModulesCount) * 100) : 0;
+
+        // 3. Learning Roadmap Progress
+        $totalLevelsCount = RoadmapPage::where('kind', 'level')->count();
+        $userProgress = LevelProgress::where('user_id', $user->id)->get();
+        $completedLevelsCount = $userProgress->where('is_completed', true)->count();
+        $roadmapPercent = $totalLevelsCount > 0 ? (int) round(($completedLevelsCount / $totalLevelsCount) * 100) : 0;
+
+        $completedSlugs = $userProgress->where('is_completed', true)->pluck('level_slug')->toArray();
+        $currentLevel = RoadmapPage::where('kind', 'level')
+            ->whereNotIn('slug', $completedSlugs)
+            ->orderBy('position')
             ->first();
 
-        // 4. Student Rank
+        // 4. Learning Activity (Keaktifan)
+        $totalActiveSeconds = (int) DailyActivity::where('user_id', $user->id)->sum('active_seconds');
+        $activeHours = round($totalActiveSeconds / 3600, 1);
+        $activeDaysCount = DailyActivity::where('user_id', $user->id)->where('active_seconds', '>', 0)->count();
+        $todaySeconds = (int) (DailyActivity::where('user_id', $user->id)->whereDate('date', today())->value('active_seconds') ?? 0);
+        $todayActiveMinutes = (int) round($todaySeconds / 60);
+
+        // 5. Student Rank & Leaderboard
+        $totalStudentsCount = LeaderboardEntry::count();
         $studentEntry = LeaderboardEntry::find($user->id);
         $rank = null;
         if ($studentEntry) {
@@ -71,7 +94,14 @@ class Dashboard extends Component
                 ->count() + 1;
         }
 
-        // 5. Recommended topic
+        // 6. Latest attempt
+        $latestAttempt = PracticeAttempt::query()
+            ->where('user_id', $user->id)
+            ->whereNotNull('submitted_at')
+            ->latest('submitted_at')
+            ->first();
+
+        // 7. Recommended topic
         $recommendedTopic = Topic::withCount(['questions' => fn ($q) => $q->where('status', 'published')])
             ->orderBy('position')
             ->first();
@@ -80,9 +110,22 @@ class Dashboard extends Component
             'user' => $user,
             'announcements' => $announcements,
             'modules' => $modules,
-            'latestAttempt' => $latestAttempt,
+            'totalModulesCount' => $totalModulesCount,
+            'submittedModulesCount' => $submittedModulesCount,
+            'gradedModulesCount' => $gradedModulesCount,
+            'pendingModulesCount' => $pendingModulesCount,
+            'moduleProgressPercent' => $moduleProgressPercent,
+            'totalLevelsCount' => $totalLevelsCount,
+            'completedLevelsCount' => $completedLevelsCount,
+            'roadmapPercent' => $roadmapPercent,
+            'currentLevel' => $currentLevel,
+            'activeHours' => $activeHours,
+            'activeDaysCount' => $activeDaysCount,
+            'todayActiveMinutes' => $todayActiveMinutes,
             'studentEntry' => $studentEntry,
             'rank' => $rank,
+            'totalStudentsCount' => $totalStudentsCount,
+            'latestAttempt' => $latestAttempt,
             'recommendedTopic' => $recommendedTopic,
         ]);
     }

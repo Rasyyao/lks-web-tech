@@ -1177,8 +1177,8 @@ MD,
    - **Wajib mengecualikan** folder `vendor/` dan `node_modules/` saat membuat berkas `.zip`.
 MD,
             'duration_minutes' => 180,
-            'opens_at' => now()->subDays(2),
-            'closes_at' => now()->addDays(20),
+            'opens_at' => now()->subDays(4)->setTime(8, 0),
+            'closes_at' => now()->addDays(14)->setTime(23, 59),
             'status' => ModuleStatus::Published,
             'max_attempts_per_day' => 5,
             'version' => 2,
@@ -1233,13 +1233,85 @@ MD,
    - Arsipkan ke dalam berkas `XX_CLIENT_SIDE_MODULE.zip`.
 MD,
             'duration_minutes' => 180,
-            'opens_at' => now()->subDays(1),
-            'closes_at' => now()->addDays(25),
+            'opens_at' => now()->subDays(2)->setTime(8, 0),
+            'closes_at' => now()->addDays(18)->setTime(23, 59),
             'status' => ModuleStatus::Published,
             'max_attempts_per_day' => 5,
             'version' => 1,
         ]);
         $moduleB->cohorts()->attach([$cohortRpl1->id, $cohortRpl2->id, $cohortSeleksi->id]);
+
+        // Module C: Client Side Module (City Delivery Network - DFS Pathfinding) from client_side_2.pdf
+        $moduleC = Module::create([
+            'slug' => 'modul-c-client-side-dfs',
+            'title' => 'Client Side Module: City Delivery Network (Interactive SVG Map with DFS Pathfinding)',
+            'track' => ModuleTrack::Client,
+            'level' => 4,
+            'summary' => 'Mengembangkan aplikasi web interaktif pengelolaan jaringan pengiriman barang kota berbasis SVG interaktif, manipulasi DOM murni, dan algoritma DFS (Depth-First Search) pathfinding.',
+            'brief_md' => <<<'MD'
+# Deskripsi Tugas: City Delivery Network (Interactive SVG Map with DFS Pathfinding)
+
+Sebuah perusahaan logistik membutuhkan aplikasi web interaktif untuk mengelola jaringan pengiriman barang di sebuah kota. Aplikasi ini menampilkan peta berupa SVG interaktif di mana pengguna dapat menambah depot (titik pengiriman), menghubungkan depot dengan rute berbagai jenis kendaraan, dan mencari jalur pengiriman menggunakan **algoritma DFS (Depth-First Search)**.
+
+Aplikasi harus mendukung interaksi penuh: click untuk menambah/menghapus depot, drag untuk memindahkan depot, scroll wheel untuk zoom, dan hold+drag untuk pan peta. Semua elemen dirender sebagai SVG menggunakan JavaScript DOM API murni.
+
+---
+
+## 1. Spesifikasi Teknis & Sub-Kriteria
+
+### Task A1: SVG Map Rendering & Depot Management (15 Poin)
+1. **Render SVG Map**:
+   - Buat SVG map berukuran `1400x800` secara programmatic menggunakan `document.createElementNS()`.
+   - Background bergradien gelap dengan dekorasi grid (*city blocks*), memenuhi seluruh viewport tanpa blank space.
+2. **Add Depot via Click**:
+   - Klik area peta memunculkan popup input nama depot. Tampilkan lingkaran SVG + label nama.
+   - Minimal jarak antar depot 50px (tidak boleh overlap). Efek hover transisi warna/ukuran.
+3. **Drag Depot**:
+   - Drag depot ke posisi baru dengan mouse (`mousedown`, `mousemove`, `mouseup`). Rute yang terhubung terupdate posisinya secara *real-time*.
+4. **Delete Depot**:
+   - Mode delete menghapus depot dan seluruh rute yang terhubung langsung dari DOM.
+5. **Persistent Data**:
+   - Seluruh data depot dan rute tersimpan otomatis di `localStorage`.
+
+### Task A2: Route Connection & Pan/Zoom (10 Poin)
+1. **Connect Depots via Route**:
+   - Klik depot source lalu target, pilih armada kendaraan:
+     - **Motor**: Warna `#ef4444` (Merah), Kecepatan 40 km/h, Biaya Rp2.000/km, Garis Solid.
+     - **Van**: Warna `#22c55e` (Hijau), Kecepatan 60 km/h, Biaya Rp5.000/km, Garis Dashed (10,5).
+     - **Drone**: Warna `#a855f7` (Ungu), Kecepatan 100 km/h, Biaya Rp12.000/km, Garis Dotted (3,3).
+   - Jarak (km) dihitung otomatis dari jarak piksel dan ditampilkan di tengah garis rute.
+2. **Pan & Zoom**:
+   - Hold-click dan drag untuk panning peta (`viewBox`). Minimap di pojok kiri bawah.
+   - Zoom in/out via scroll wheel berpusat pada kursor mouse, tombol `+ / - / reset` di pojok kanan bawah.
+
+### Task A3: DFS Pathfinding & Visualization (20 Poin)
+1. **Implementasi DFS Rekursif**:
+   - Mencari semua jalur pengiriman dari depot asal ke target (maksimal kedalaman: 10, maksimal jalur: 15).
+   - Menghitung total jarak (km), biaya (Rp), dan durasi (menit).
+2. **Visualisasi Step-by-Step**:
+   - Node sedang dieksplorasi (kuning `#f59e0b`), sudah dieksplorasi (cyan `#22d3ee`), backtrack (merah `#ef4444`), jalur ditemukan (hijau `#22c55e`).
+   - Kontrol animasi: Step, Play/Pause, Reset, dan slider kecepatan (50ms - 800ms).
+
+### Task A4: Path Highlight & Delivery Animation (5 Poin)
+- Highlight rute terpilih dengan efek neon/glow SVG filter.
+- Animasi pergerakan paket antar node secara smooth dan indikator checkmark saat sampai.
+MD,
+            'rules_md' => <<<'MD'
+## Peraturan & Format Pengiriman
+1. **Algoritma DFS HARUS diimplementasikan sendiri** (dilarang menggunakan library pathfinding eksternal).
+2. **SVG map harus dibuat secara programmatic** menggunakan JavaScript DOM API murni.
+3. Interaksi mouse (click, drag, zoom, pan) menggunakan native DOM events.
+4. Data harus persistent tersimpan di `localStorage`.
+5. Format arsip pengumpulan: Folder `XX_CLIENT_SIDE_MODULE` diarsipkan ke `XX_CLIENT_SIDE_MODULE.zip`.
+MD,
+            'duration_minutes' => 240,
+            'opens_at' => now()->subDay()->setTime(8, 0),
+            'closes_at' => now()->addDays(21)->setTime(23, 59),
+            'status' => ModuleStatus::Published,
+            'max_attempts_per_day' => 5,
+            'version' => 1,
+        ]);
+        $moduleC->cohorts()->attach([$cohortRpl1->id, $cohortRpl2->id, $cohortSeleksi->id]);
 
         // Module Assets for PintarMenabung (Modul A)
         ModuleAsset::create([
@@ -1283,6 +1355,14 @@ MD,
             'label' => 'design-mockups-assets.zip',
             'path' => 'assets/design-mockups-assets.zip',
             'size' => 1024 * 850,
+        ]);
+
+        // Module Assets for Client Side DFS (Modul C)
+        ModuleAsset::create([
+            'module_id' => $moduleC->id,
+            'label' => 'CLIENT_SIDE_MODULE_MEDIA.zip',
+            'path' => 'assets/CLIENT_SIDE_MODULE_MEDIA.zip',
+            'size' => 1024 * 650,
         ]);
 
         // 9. Announcements

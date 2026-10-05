@@ -45,6 +45,13 @@ class ModuleShow extends Component
     ): void {
         $user = Auth::user();
 
+        // Enforce single-final-submission rule: disable if already submitted
+        if ($this->module->submissions()->where('user_id', $user->id)->exists()) {
+            $this->addError('zipFile', 'Tugas modul ini sudah dikumpulkan dan telah dikunci.');
+
+            return;
+        }
+
         $this->validate([
             'zipFile' => ['required', 'file', 'max:20480'],
         ], [
@@ -79,11 +86,16 @@ class ModuleShow extends Component
             ->orderByDesc('attempt_no')
             ->get();
 
+        $hasSubmitted = $submissions->isNotEmpty();
+        $latestSubmission = $submissions->first();
+
         $todayAttemptsCount = $this->module->todaySubmissionCount($user);
         $remainingAttempts = max(0, $this->module->max_attempts_per_day - $todayAttemptsCount);
 
         return view('livewire.student.module-show', [
             'submissions' => $submissions,
+            'hasSubmitted' => $hasSubmitted,
+            'latestSubmission' => $latestSubmission,
             'todayAttemptsCount' => $todayAttemptsCount,
             'remainingAttempts' => $remainingAttempts,
             'isOpen' => $this->module->isOpen(),

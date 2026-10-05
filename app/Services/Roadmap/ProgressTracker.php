@@ -198,7 +198,6 @@ class ProgressTracker
         $quizzesComplete = ($checkpointsTotal === 0 || $checkpointsMarked >= $checkpointsTotal);
         $exercisesComplete = ($exercisesTotal === 0 || $exercisesPassed >= $exercisesTotal);
 
-        // While Tugas Coding feature is on hold (Coming Soon), completing quizzes completes the level
         if ($quizzesComplete) {
             $isCompleted = true;
             $percent = 100;

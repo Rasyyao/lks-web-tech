@@ -79,7 +79,6 @@ class SubmissionReview extends Component
 
         // Audit log
         AuditLog::record(
-            actorId: $mentor->id,
             action: 'submission.reviewed',
             subject: $this->submission,
             meta: [
@@ -87,7 +86,6 @@ class SubmissionReview extends Component
                 'new_score' => $this->submission->manual_score,
                 'status' => $newStatus->value,
             ],
-            ip: request()->ip()
         );
 
         // Leaderboard recompute job per PRD F8

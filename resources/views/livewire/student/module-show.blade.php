@@ -25,9 +25,21 @@
             {{-- Module Overview Card --}}
             <x-panel class="space-y-4">
                 <div class="flex flex-wrap items-center gap-2 text-xs">
-                    <span class="font-bold text-brand-deep uppercase tracking-wider px-2 py-0.5 rounded-cell bg-tint border border-brand-deep/10">
-                        {{ $module->track->label() }}
-                    </span>
+                    @if($module->track === \App\Enums\ModuleTrack::Server)
+                        <span class="inline-flex items-center gap-1 font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-cell bg-purple-50 text-purple-700 border border-purple-200">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2" />
+                            </svg>
+                            Server-side
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1 font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-cell bg-sky-50 text-sky-700 border border-sky-200">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            Client-side
+                        </span>
+                    @endif
                     <span class="text-rule">•</span>
                     <span class="tabular-nums font-medium text-ink bg-paper px-2 py-0.5 rounded-cell border border-rule">
                         Tingkat {{ $module->level }}
@@ -36,10 +48,15 @@
                     <span class="tabular-nums text-ink-muted">
                         Durasi {{ $module->duration_minutes }} Menit
                     </span>
-                    <span class="text-rule">•</span>
-                    <span class="tabular-nums text-ink-muted">
-                        Maks. {{ $module->max_attempts_per_day }} kiriman / hari
-                    </span>
+                    @if($hasSubmitted)
+                        <span class="text-rule">•</span>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-cell bg-pass/10 text-pass text-xs font-bold border border-pass/30">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Sudah Dikumpulkan
+                        </span>
+                    @endif
                 </div>
 
                 <div class="space-y-2">
@@ -381,16 +398,16 @@
 
                 <div class="space-y-2 text-xs">
                     <div class="flex justify-between items-center">
-                        <span class="text-ink-muted">Waktu Buka:</span>
+                        <span class="text-ink-muted">Diupload:</span>
                         <time class="font-medium text-ink tabular-nums">
-                            {{ $module->opens_at?->translatedFormat('d M Y, H:i') ?? 'Terbuka' }}
+                            {{ $module->opens_at?->translatedFormat('l, d M Y') ?? 'Terbuka' }}
                         </time>
                     </div>
 
                     <div class="flex justify-between items-center">
                         <span class="text-ink-muted">Batas Tenggat:</span>
                         <time class="font-bold text-brand-deep tabular-nums">
-                            {{ $module->closes_at?->translatedFormat('d M Y, H:i') ?? 'Tidak terbatas' }}
+                            {{ $module->closes_at?->translatedFormat('l, d M Y, H:i') ?? 'Tidak terbatas' }}
                         </time>
                     </div>
 
@@ -404,18 +421,59 @@
             </x-panel>
 
             {{-- Panel 2: Quick ZIP Submission Form (Prominently Placed in Sidebar) --}}
-            <x-panel class="space-y-4 border-2 {{ $isOpen && $remainingAttempts > 0 ? 'border-brand/40 bg-sheet' : 'border-rule bg-paper/50' }}">
+            <x-panel class="space-y-4 border-2 {{ $hasSubmitted ? 'border-pass/40 bg-sheet ring-1 ring-pass/10' : ($isOpen && $remainingAttempts > 0 ? 'border-brand/40 bg-sheet' : 'border-rule bg-paper/50') }}">
                 <div>
                     <h3 class="text-base font-bold text-ink flex items-center justify-between">
                         <span>Pengumpulan Tugas</span>
                         <span class="text-[11px] font-mono font-normal text-ink-muted">.ZIP (Maks. 20MB)</span>
                     </h3>
                     <p class="text-xs text-ink-muted mt-0.5">
-                        Unggah arsip proyek kode sumber Anda untuk diuji otomatis dan dinilai oleh mentor.
+                        @if($hasSubmitted)
+                            Tugas Anda telah berhasil dikirim dan tersimpan di sistem.
+                        @else
+                            Unggah arsip proyek kode sumber Anda untuk diuji otomatis dan dinilai oleh mentor.
+                        @endif
                     </p>
                 </div>
 
-                @if(! $isOpen)
+                @if($hasSubmitted)
+                    <div class="p-3.5 rounded-cell bg-pass/10 border border-pass/30 space-y-2.5">
+                        <div class="flex items-center gap-2 text-pass font-bold text-xs">
+                            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Tugas Berhasil Dikumpulkan</span>
+                        </div>
+                        <p class="text-xs text-ink-muted leading-relaxed">
+                            Anda telah mengumpulkan tugas modul ini pada <strong class="text-ink tabular-nums">{{ $latestSubmission?->created_at?->translatedFormat('l, d M Y, H:i') }}</strong>. Formulir pengumpulan telah dikunci.
+                        </p>
+                    </div>
+
+                    {{-- Disabled File Input & Submit Button --}}
+                    <div class="opacity-60 space-y-3 pt-1">
+                        <div class="space-y-1">
+                            <label class="block text-xs font-semibold text-ink-muted">
+                                Berkas Proyek (.zip):
+                            </label>
+                            <input
+                                type="file"
+                                disabled
+                                class="block w-full text-xs text-ink-muted cursor-not-allowed border border-rule rounded-cell bg-paper py-1.5 px-3"
+                            >
+                        </div>
+
+                        <button
+                            type="button"
+                            disabled
+                            class="w-full text-center py-2 px-4 text-xs font-bold rounded-cell bg-paper text-ink-muted border border-rule cursor-not-allowed flex items-center justify-center gap-1.5"
+                        >
+                            <svg class="w-3.5 h-3.5 text-pass" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span>Pengumpulan Dikunci (Sudah Dikumpulkan)</span>
+                        </button>
+                    </div>
+                @elseif(! $isOpen)
                     <div class="p-3 rounded-cell bg-paper text-xs text-ink-muted border border-rule text-center">
                         Modul ini sedang ditutup dan tidak menerima pengumpulan tugas.
                     </div>

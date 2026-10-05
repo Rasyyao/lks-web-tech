@@ -53,10 +53,12 @@ class LeaderboardPage extends Component
             }
         }
 
+        $topThree = array_slice($rankedEntries, 0, 3);
         $cohorts = Cohort::orderBy('name')->get();
 
         return view('livewire.shared.leaderboard-page', [
             'rankedEntries' => $rankedEntries,
+            'topThree' => $topThree,
             'currentUserRank' => $currentUserRank,
             'currentUserEntry' => $currentUserEntry,
             'cohorts' => $cohorts,
