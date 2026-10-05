@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FileDownloadController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\RoadmapActivityController;
 use App\Livewire\Mentor\StudentActivityTimeline;
 use App\Livewire\Mentor\SubmissionInbox;
@@ -26,6 +27,13 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
+| Public & Landing Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/', LandingController::class)->name('landing');
+
+/*
+|--------------------------------------------------------------------------
 | Guest Routes
 |--------------------------------------------------------------------------
 */
@@ -43,9 +51,6 @@ Route::middleware('guest')->group(function () {
 */
 Route::middleware(['auth', 'active', 'password.fresh'])->group(function () {
     Route::post('/keluar', [AuthController::class, 'logout'])->name('logout');
-
-    // Root sends everyone to their own home (student / mentor / admin).
-    Route::get('/', fn () => redirect()->to(auth()->user()->homeUrl()));
 
     // Profile and password change
     Route::get('/profil', Profile::class)->name('profile');
